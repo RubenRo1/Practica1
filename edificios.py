@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 class Edificio(ABC):
-    def __init__(self,nombre, coste_construccion, coste_mantenimiento ,impacto_felicidad):
+    def __init__(self,nombre: str, coste_construccion: int , coste_mantenimiento: int ,impacto_felicidad : int):
         
         self.nombre = nombre
         self.coste_construccion = coste_construccion

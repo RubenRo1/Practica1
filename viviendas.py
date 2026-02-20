@@ -3,7 +3,7 @@ from edificios import Edificio
 class Viviendas(Edificio):
     
         
-    def __init__(self,capacidad,num_hogares, nombre, coste_construccion, coste_mantenimiento ,impacto_felicidad):
+    def __init__(self,capacidad: int, num_hogares: int, nombre : str, coste_construccion: int, coste_mantenimiento: int ,impacto_felicidad: int):
         
         super().__init__(nombre, coste_construccion, coste_mantenimiento ,impacto_felicidad)
         self.capacidad = capacidad
