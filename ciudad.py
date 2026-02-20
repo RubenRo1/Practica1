@@ -35,15 +35,23 @@ class Ciudad:
             
         self.presupuesto += (ingreso - mantenimiento) + self.IMPUESTO_POR_HABITANTE
         
-    def actualizar_felicidad():
+    def actualizar_felicidad(self):
+        
         return 0
         
-    def obtener_capacidad_viviendas():
+    def obtener_capacidad_viviendas(self) -> int:
+        
+        capacidad_total = 0
+       
+        for edificio in self.edificios:
+           
+           capacidad_total += edificio.obtener_capacidad_disponible()
+           
+       
+        
+    def obtener_capacidad_oficinas(self):
         return 0
         
-    def obtener_capacidad_oficinas():
-        return 0
-        
-    def obtener_empresas_actuales():
+    def obtener_empresas_actuales(self):
         return 0
                  
