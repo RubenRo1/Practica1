@@ -1,7 +1,7 @@
 from edificios import Edificio
 from viviendas import Viviendas
 from oficinas import Oficinas
-from equipamiento import Equipamientos
+from equipamiento import Equipamiento
 
 class Ciudad:
     def __init__(self, nombre : str, habitantes : int, presupuesto : int, felicidad : int, edificios : list):
@@ -42,7 +42,14 @@ class Ciudad:
         
     def actualizar_felicidad(self):
         
+        if self.habitantes == 0:
+            
+            self.felicidad = 50
+            
+            return 
+        
         felicidad_total = 0
+        num_equipamientos = 0
         
         for edificio in self.edificios:
             
@@ -52,7 +59,6 @@ class Ciudad:
         
         capacidad_vivienda = self.obtener_capacidad_viviendas()
         
-        ratio = self.habitantes/capacidad_vivienda
         
         if capacidad_vivienda == 0:
             
@@ -60,6 +66,7 @@ class Ciudad:
         
         else:
         
+            ratio = self.habitantes/capacidad_vivienda
             if ratio > 0.85:
                 
                 self.felicidad -= 10
@@ -69,10 +76,23 @@ class Ciudad:
                 self.felicidad +=1
                 
         for edificio in self.edificios:
+            
             if isinstance(edificio,Equipamiento):
-                
-    
+                    
+                num_equipamientos +=1
         
+        equipamientos_necesarios = self.habitantes / 100
+        
+        if num_equipamientos < equipamientos_necesarios:
+            
+            self.felicidad -= 1
+        
+        else:
+            
+            self.felicidad += 1
+
+        self.felicidad = max(0, min(100, self.felicidad))        
+    
     def obtener_capacidad_viviendas(self) -> int:
    
         capacidad_total = 0
