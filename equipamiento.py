@@ -9,9 +9,7 @@ class Equipamiento(Edificio):
         self.capacidad_uso = capacidad_uso
         
     def calcular_ingresos(self):
-            
         return 0
          
     def obtener_capacidad_disponible(self):
-        
         return self.capacidad_uso
