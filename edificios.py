@@ -24,34 +24,31 @@ class Edificio(ABC):
     @abstractmethod
     def obtener_capacidad_disponible(self):
         pass
-
     
+    @property
+    def nombre(self):
+        return self.nombre
+    @nombre.setter
+    def nombre(self,nombre):
+        self.nombre = nombre
     
+    @property
+    def coste_construccion(self):
+        return self.coste_construccion
+    @coste_construccion.setter
+    def coste_construccion(self,coste_construccion):
+        self.coste_construccion = coste_construccion
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    @property
+    def coste_mantenimiento(self):
+        return self.coste_mantenimiento
+    @coste_mantenimiento.setter
+    def set_coste_mantenimiento(self,coste_mantenimiento):
+        self.coste_mantenimiento = coste_mantenimiento
+        
+    @property
+    def impacto_felicidad(self):     
+        return self.impacto_felicidad
+    @impacto_felicidad.setter
+    def impacto_felicidad(self,impacto_felicidad):
+        self.impacto_felicidad = impacto_felicidad    

@@ -30,3 +30,24 @@ class Oficinas(Edificio):
     
     def obtener_capacidad_disponible(self):
         return self.capacidad_oficinas - self.empresas_actuales
+    
+    @property
+    def capacidad_oficinas(self):
+       return self.capacidad_oficinas
+    @capacidad_oficinas.setter   
+    def capacidad_oficinas(self,capacidad_oficinas):
+        self.capacidad_oficinas = capacidad_oficinas
+
+    @property
+    def empresas_actuales(self):
+       return self.empresas_actuales
+    @empresas_actuales.setter    
+    def empresas_actuales(self,empresas_actuales):
+        self.empresas_actuales = empresas_actuales 
+    
+    @property
+    def alquiler_por_oficina(self):
+       return self.alquiler_por_oficina
+    @alquiler_por_oficina.setter
+    def alquiler_por_oficina(self,alquiler_por_oficina):
+        self.alquiler_por_oficina = alquiler_por_oficina

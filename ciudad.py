@@ -92,4 +92,44 @@ class Ciudad:
                 empresas += edificio.empresas_actuales
                 
         return empresas
+
+    @property
+    def nombre(self):
+        return self.nombre
+    @nombre.setter
+    def nombre(self,nombre):
+        self.nombre = nombre
+
+    @property
+    def habitantes(self):
+        return self.habitantes
+    @habitantes.setter
+    def habitantes(self,habitantes):
+        self.habitantes = habitantes
+    
+    @property
+    def presupuesto(self):
+        return self.presupuesto
+    @presupuesto.setter
+    def presupuesto(self,presupuesto):
+        self.presupuesto = presupuesto
+        
+    @property
+    def felicidad(self):
+        return self.felicidad
+    @felicidad.setter
+    def felicidad(self,felicidad):
+        self.felicidad = felicidad
+    
+    @property
+    def edificios(self):
+        return self.edificios
+    @edificios.setter
+    def edificios(self,edificios):
+        self.edificios = edificios
+
+
+
+
+
                  
