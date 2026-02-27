@@ -21,6 +21,24 @@ PRESUPUESTO_INICIAL = None
 # Configuración de semilla para reproducibilidad (opcional)
 random.seed(42)
 
+def inmigracion(ciudad:Ciudad):
+    if random.random() < 0.4:
+        ciudad.habitantes = ciudad.habitantes + random.randint(5, 200)
+
+def emigracion(ciudad:Ciudad):
+    #Almacenamos habitantes en una variable para no estar accediendo constantemente
+    habitantes = ciudad.habitantes
+    if ciudad.felicidad > 40:
+        if habitantes > 5 and random.random() < 0.2:
+            ciudad.habitantes = habitantes - random.randint(5, 200 if habitantes > 200 else habitantes)
+    else:
+        if habitantes > 5 and random.random() < 0.35:
+            ciudad.habitantes = habitantes - random.randint(5, 200 if habitantes > 200 else habitantes)
+
+def crear_empresas(ciudad:Ciudad):
+    pass
+
+
 
 # Completar las con las funciones que realizan la simulación
 
