@@ -16,4 +16,17 @@ class Viviendas(Edificio):
     
     def obtener_capacidad_disponible(self):
         return 0
+    
+    @property
+    def capacidad(self):
+        return self.capacidad
+    @capacidad.setter
+    def capacidad(self,capacidad):
+        self.capacidad = capacidad
 
+    @property
+    def num_hogares(self):
+        return self.num_hogares
+    @num_hogares.setter
+    def num_hogares(self, num_hogares):
+        self.num_hogares = num_hogares

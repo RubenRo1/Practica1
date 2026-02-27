@@ -13,3 +13,17 @@ class Equipamiento(Edificio):
          
     def obtener_capacidad_disponible(self):
         return self.capacidad_uso
+    
+    @property
+    def tipo(self):
+        return self.tipo
+    @tipo.setter
+    def tipo(self,tipo):
+        self.tipo = tipo
+    
+    @property
+    def capacidad_uso(self): 
+        return self.capacidad_uso 
+    @capacidad_uso.setter
+    def capacidad_uso(self,capacidad_uso): 
+        self.capacidad_uso = capacidad_uso
