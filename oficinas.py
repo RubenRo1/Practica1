@@ -1,6 +1,24 @@
 from edificios import Edificio
 
 class Oficinas(Edificio):
+    """ Representa un edificio de tipo oficina.
+    Attributes
+    ----------
+    capacidad_oficinas : int
+        Capacidad máxima de las oficinas.
+    empresas_actuales : int
+        Número de empresas actuales.
+    alquiler_por_oficina : int
+        Precio del alquiler para cada oficina.
+    Methods
+    -------
+    asignar_empresas(cantidad)
+        Añade nuevas empresas hasta completar la capacidad disponible.
+    eliminar_empresas(cantidad)
+        Elimina empresas del edificio.
+    obtener_capacidad_disponible()
+        Devuelve la capacidad disponible de oficinas.   
+    """
     def __init__(self, capacidad_oficinas:int, empresas_actuales:int, alquiler_por_oficina:int, nombre:str, coste_construccion:int, coste_mantenimiento:int ,impacto_felicidad:int):
         
         super().__init__(nombre, coste_construccion, coste_mantenimiento, impacto_felicidad)
@@ -24,7 +42,9 @@ class Oficinas(Edificio):
                     
         return empresas_borrar
         
-    
+    def __str__(self):
+        return self.obtener_informacion()
+        
     def calcular_ingresos(self):
         return self.empresas_actuales * self.alquiler_por_oficina
     

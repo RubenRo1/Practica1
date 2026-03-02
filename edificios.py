@@ -1,13 +1,36 @@
 from abc import ABC, abstractmethod
 
-class Edificio(ABC):
+class Edificio(ABC):   
+    """
+    Clase abstracta que define los distintos tipos de edificio.
+
+    Attributes
+    ----------
+    nombre : str
+        Nombre del edificio.
+    coste_construccion : int
+        Coste de construcción.
+    coste_mantenimiento : int
+        Coste de mantenimiento.
+    impacto_felicidad : int
+        Impacto en la felicidad de la población.
+        
+    Methods
+    -------
+    obtener_informacion()
+        Devuelve toda la información del edificio.
+    calcular_ingresos()
+        Calcula los ingresos generados por el edificio.
+    obtener_capacidad_disponible()
+        Devuelve la capacidad disponible del edificio.
+    """
     def __init__(self,nombre: str, coste_construccion: int , coste_mantenimiento: int ,impacto_felicidad : int):
         
         self.nombre = nombre
         self.coste_construccion = coste_construccion
         self.coste_mantenimiento = coste_mantenimiento
         self.impacto_felicidad = impacto_felicidad
-        
+            
     def obtener_informacion(self):
         
         return (

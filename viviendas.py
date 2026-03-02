@@ -1,7 +1,22 @@
 from edificios import Edificio
 
 class Viviendas(Edificio):
-    
+    """ Representa un edificio de tipo vivienda.
+    Attributes
+    ----------
+    capacidad : int
+        Capacidad máxima de la vivienda.
+    num_hogares : int
+        Número de hogares que ocupan la vivienda.
+    _PRECIO_ALQUILER : int
+        Variable privada que define el precio fijo del alquiler (300 €).
+    Methods
+    -------
+    calcular_ingresos()
+        Devuelve los ingresos generados (num_hogares * precio del alquiler).
+    obtener_capacidad_disponible()
+        Devuelve la capacidad disponible de la vivienda.     
+    """
         
     def __init__(self,capacidad: int, num_hogares: int, nombre : str, coste_construccion: int, coste_mantenimiento: int ,impacto_felicidad: int):
         
