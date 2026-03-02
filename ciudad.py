@@ -4,7 +4,7 @@ from oficinas import Oficinas
 from equipamiento import Equipamiento
 
 class Ciudad:
-
+    
     def __init__(self, nombre:str, habitantes:int, presupuesto:int, felicidad:int, edificios:list):
         self.nombre = nombre
         self.habitantes = habitantes
