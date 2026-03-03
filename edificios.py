@@ -66,10 +66,10 @@ class Edificio(ABC):
         Información completa del edificio.
         """
         return (
-            f"Nombre: {self.nombre}\n"
-            f"Coste Construcción: {self.coste_construccion}\n"
-            f"Coste Mantenimiento: {self.coste_mantenimiento}\n"
-            f"Impacto felicidad: {self.impacto_felicidad}"
+            f"Nombre: {self._nombre}\n"
+            f"Coste Construcción: {self._coste_construccion}\n"
+            f"Coste Mantenimiento: {self._coste_mantenimiento}\n"
+            f"Impacto felicidad: {self._impacto_felicidad}"
             )
     
     @abstractmethod

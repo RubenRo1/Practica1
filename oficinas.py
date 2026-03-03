@@ -27,7 +27,7 @@ class Oficinas(Edificio):
     obtener_capacidad_disponible()
         Devuelve la capacidad disponible de oficinas.   
     """
-    def __init__(self, capacidad_oficinas:int, empresas_actuales:int, alquiler_por_oficina:int, nombre:str, coste_construccion:int, coste_mantenimiento:int ,impacto_felicidad:int):
+    def __init__(self, capacidad_oficinas:int, alquiler_por_oficina:int, nombre:str, coste_construccion:int, coste_mantenimiento:int ,impacto_felicidad:int):
         """Asigna atributos al objeto.
 
         Parameters
@@ -72,7 +72,7 @@ class Oficinas(Edificio):
         """
         empresas_disponibles = self.obtener_capacidad_disponible()
         empresas_añadir = min(cantidad, empresas_disponibles)
-        self.empresas_actuales += empresas_añadir
+        self._empresas_actuales += empresas_añadir
                 
         return empresas_añadir
     
@@ -90,8 +90,8 @@ class Oficinas(Edificio):
         int
         Número real de empresas eliminadas.
         """
-        empresas_borrar = min(cantidad, self.empresas_actuales)
-        self.empresas_actuales -= empresas_borrar
+        empresas_borrar = min(cantidad, self._empresas_actuales)
+        self._empresas_actuales -= empresas_borrar
                     
         return empresas_borrar
         
@@ -117,7 +117,7 @@ class Oficinas(Edificio):
         int
         Ingresos totales generados.
         """
-        return self.empresas_actuales * self.alquiler_por_oficina
+        return self._empresas_actuales * self._alquiler_por_oficina
     
     def obtener_capacidad_disponible(self):
         """Devuelve la capacidad disponible de oficinas.
@@ -131,7 +131,7 @@ class Oficinas(Edificio):
         int
         Número de oficinas libres.
         """
-        return self.capacidad_oficinas - self.empresas_actuales
+        return self._capacidad_oficinas - self._empresas_actuales
     
     @property
     def capacidad_oficinas(self):

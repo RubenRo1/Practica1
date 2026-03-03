@@ -46,6 +46,8 @@ class Equipamiento(Edificio):
         super().__init__(nombre, coste_construccion, coste_mantenimiento, impacto_felicidad)
         self._tipo = tipo
         self._capacidad_uso = capacidad_uso
+        self._tipo = tipo
+        self._capacidad_uso = capacidad_uso
         
     def calcular_ingresos(self):
         """Calcula los ingresos generados por el equipamiento.
