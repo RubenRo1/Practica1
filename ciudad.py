@@ -4,16 +4,84 @@ from oficinas import Oficinas
 from equipamiento import Equipamiento
 
 class Ciudad:
+    """Representa una ciudad que contiene edificios, habitantes y presupuesto.
+
+    Esta clase gestiona la construcción de edificios, la actualización del
+    presupuesto y la felicidad de la población, así como el cálculo de
+    capacidades de viviendas y oficinas, y el número de empresas presentes.
+
+    Attributes
+    ----------
+    nombre : str
+        Nombre de la ciudad.
+    habitantes : int
+        Número de habitantes de la ciudad.
+    presupuesto : int
+        Presupuesto disponible de la ciudad.
+    felicidad : int
+        Nivel de felicidad de la población (0-100).
+    edificios : list
+        Lista de edificios presentes en la ciudad.
+    _IMPUESTO_POR_HABITANTE : int
+        Cantidad fija de ingresos por habitante.
+        
+    Methods
+    -------
+    construir_edificio(edificio)
+        Construye un edificio si hay presupuesto suficiente.
+    actualizar_presupuesto()
+        Actualiza el presupuesto sumando ingresos, impuestos y restando mantenimiento.
+    actualizar_felicidad()
+        Calcula y actualiza la felicidad de la población según distintos factores.
+    obtener_capacidad_viviendas()
+        Devuelve la capacidad total de todas las viviendas.
+    obtener_capacidad_oficinas()
+        Devuelve la capacidad total de todas las oficinas.
+    obtener_empresas_actuales()
+        Devuelve el número total de empresas en todas las oficinas.
+    """
     
     def __init__(self, nombre:str, habitantes:int, presupuesto:int, felicidad:int, edificios:list):
-        self.nombre = nombre
-        self.habitantes = habitantes
-        self.presupuesto = presupuesto
-        self.felicidad = max(0, min(100,felicidad))
-        self.edificios = edificios
+        
+        """Inicializa los atributos de la ciudad.
+
+        Parameters
+        ----------
+        nombre : str
+            Nombre de la ciudad.
+        habitantes : int
+            Número de habitantes.
+        presupuesto : int
+            Presupuesto inicial.
+        felicidad : int
+            Nivel inicial de felicidad (0-100).
+        edificios : list
+            Lista inicial de edificios.
+
+        Returns
+        -------
+        None.
+        """
+        self._nombre = nombre
+        self._habitantes = habitantes
+        self._presupuesto = presupuesto
+        self._felicidad = max(0, min(100,felicidad))
+        self._edificios = edificios
         self._IMPUESTO_POR_HABITANTE = 500
 
     def construir_edificio(self,edificio: Edificio) -> bool:
+        """Construye un edificio si hay presupuesto suficiente.
+
+        Parameters
+        ----------
+        edificio : Edificio
+            Objeto de tipo Edificio a construir.
+
+        Returns
+        -------
+        bool
+        True si se construyó el edificio, False si no hay presupuesto suficiente.
+        """
         
         if self.presupuesto > edificio.coste_construccion:
             self.edificios.append(edificio)
@@ -22,7 +90,16 @@ class Ciudad:
         return False
         
     def actualizar_presupuesto(self):
+        """Actualiza el presupuesto de la ciudad.
+
+        Suma los ingresos de todos los edificios, resta el coste de mantenimiento,
+        y añade los ingresos provenientes de impuestos por habitante.
         
+        Returns
+        -------
+        None
+        """
+
         ingresos = 0
         mantenimiento = 0
         
@@ -33,6 +110,16 @@ class Ciudad:
         self.presupuesto += ingresos - mantenimiento + self.IMPUESTO_POR_HABITANTE * self.habitantes
 
     def actualizar_felicidad(self):
+        """Calcula y actualiza la felicidad de la población.
+
+        Factores considerados:
+        - Impacto de todos los edificios.
+        - Ratio habitantes/capacidad de viviendas.
+        - Número de equipamientos en relación a los habitantes.
+        Returns
+        -------
+        None
+        """
         
         if self.habitantes == 0:
             self.felicidad = 50
@@ -70,6 +157,13 @@ class Ciudad:
         self.felicidad = max(0, min(100, self.felicidad))        
     
     def obtener_capacidad_viviendas(self) -> int:
+        """Devuelve la capacidad total de todas las viviendas de la ciudad.
+
+        Returns
+        -------
+        int
+        Capacidad total de todas las viviendas.
+        """
         capacidad_total = 0
         for edificio in self.edificios:
             if isinstance(edificio, Viviendas):
@@ -78,6 +172,13 @@ class Ciudad:
         return capacidad_total
         
     def obtener_capacidad_oficinas(self) -> int:
+        """Devuelve la capacidad total de todas las oficinas de la ciudad.
+
+        Returns
+        -------
+        int
+        Capacidad total de oficinas.
+        """
         capacidad_total = 0
         for edificio in self.edificios:
             if isinstance(edificio, Oficinas):
@@ -86,6 +187,13 @@ class Ciudad:
         return capacidad_total
         
     def obtener_empresas_actuales(self) -> int:
+        """Devuelve el número total de empresas en todas las oficinas.
+
+        Returns
+        -------
+        int
+        Número total de empresas.
+        """
         empresas = 0
         for edificio in self.edificios:
             if isinstance(edificio, Oficinas):
@@ -95,38 +203,38 @@ class Ciudad:
 
     @property
     def nombre(self):
-        return self.nombre
+        return self._nombre
     @nombre.setter
     def nombre(self,nombre):
-        self.nombre = nombre
+        self._nombre = nombre
 
     @property
     def habitantes(self):
-        return self.habitantes
+        return self._habitantes
     @habitantes.setter
     def habitantes(self,habitantes):
-        self.habitantes = habitantes
+        self._habitantes = habitantes
     
     @property
     def presupuesto(self):
-        return self.presupuesto
+        return self._presupuesto
     @presupuesto.setter
     def presupuesto(self,presupuesto):
-        self.presupuesto = presupuesto
+        self._presupuesto = presupuesto
         
     @property
     def felicidad(self):
-        return self.felicidad
+        return self._felicidad
     @felicidad.setter
     def felicidad(self,felicidad):
-        self.felicidad = felicidad
+        self._felicidad = felicidad
     
     @property
     def edificios(self):
-        return self.edificios
+        return self._edificios
     @edificios.setter
     def edificios(self,edificios):
-        self.edificios = edificios
+        self._edificios = edificios
 
 
 
