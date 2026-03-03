@@ -21,6 +21,14 @@ PRESUPUESTO_INICIAL = None
 # Configuración de semilla para reproducibilidad (opcional)
 random.seed(42)
 
+#Cola con las oficinas con espacio disponible y llenas
+OFICINAS_CON_ESPACIO = []
+OFICINAS_LLENAS = []
+
+def encontrar_oficinas(ciudad:Ciudad, empresas:int):
+    #Y si implementamos una cola con las oficinas que aun tiene huecos?
+    ciudad.edificios.sort(lambda empresa: empresa.obtener_capacidad_disponible())        
+
 def inmigracion(ciudad:Ciudad):
     if random.random() < 0.4:
         ciudad.habitantes = ciudad.habitantes + random.randint(5, 200)
@@ -36,7 +44,18 @@ def emigracion(ciudad:Ciudad):
             ciudad.habitantes = habitantes - random.randint(5, 200 if habitantes > 200 else habitantes)
 
 def crear_empresas(ciudad:Ciudad):
-    pass
+    if random.random() < 0.3:
+        #Hacer funcion que busca oficinas, y checkear si se pueden meter todas antes
+        for _ in range(random.randint(1, 5)):
+            if ciudad.obtener_capacidad_oficinas() - ciudad.obtener_empresas_actuales() == 0:
+                break
+             
+
+def cierre_empresas(ciudad:Ciudad):
+    if random.random() < 0.15:
+        for _ in range(random.randint(1, 3)):
+            
+
 
 
 
