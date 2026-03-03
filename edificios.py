@@ -26,18 +26,18 @@ class Edificio(ABC):
     """
     def __init__(self,nombre: str, coste_construccion: int , coste_mantenimiento: int ,impacto_felicidad : int):
         
-        self.nombre = nombre
-        self.coste_construccion = coste_construccion
-        self.coste_mantenimiento = coste_mantenimiento
-        self.impacto_felicidad = impacto_felicidad
+        self._nombre = nombre
+        self._coste_construccion = coste_construccion
+        self._coste_mantenimiento = coste_mantenimiento
+        self._impacto_felicidad = impacto_felicidad
             
     def obtener_informacion(self):
         
         return (
-            f"Nombre: {self.nombre}\n"
-            f"Coste Construcción: {self.coste_construccion}\n"
-            f"Coste Mantenimiento: {self.coste_mantenimiento}\n"
-            f"Impacto felicidad: {self.impacto_felicidad}"
+            f"Nombre: {self._nombre}\n"
+            f"Coste Construcción: {self._coste_construccion}\n"
+            f"Coste Mantenimiento: {self._coste_mantenimiento}\n"
+            f"Impacto felicidad: {self._impacto_felicidad}"
             )
     
     @abstractmethod
@@ -50,28 +50,28 @@ class Edificio(ABC):
     
     @property
     def nombre(self):
-        return self.nombre
+        return self._nombre
     @nombre.setter
     def nombre(self,nombre):
-        self.nombre = nombre
+        self._nombre = nombre
     
     @property
     def coste_construccion(self):
-        return self.coste_construccion
+        return self._coste_construccion
     @coste_construccion.setter
     def coste_construccion(self,coste_construccion):
-        self.coste_construccion = coste_construccion
+        self._coste_construccion = coste_construccion
     
     @property
     def coste_mantenimiento(self):
-        return self.coste_mantenimiento
+        return self._coste_mantenimiento
     @coste_mantenimiento.setter
     def set_coste_mantenimiento(self,coste_mantenimiento):
-        self.coste_mantenimiento = coste_mantenimiento
+        self._coste_mantenimiento = coste_mantenimiento
         
     @property
     def impacto_felicidad(self):     
-        return self.impacto_felicidad
+        return self._impacto_felicidad
     @impacto_felicidad.setter
     def impacto_felicidad(self,impacto_felicidad):
-        self.impacto_felicidad = impacto_felicidad    
+        self._impacto_felicidad = impacto_felicidad    

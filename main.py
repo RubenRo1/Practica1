@@ -2,6 +2,7 @@
 Simulación de la evolución de SimCiudad mediante eventos aleatorios
 """
 import sys
+import json
 import random
 import pandas as pd
 from edificios import Edificio
@@ -21,13 +22,9 @@ PRESUPUESTO_INICIAL = None
 # Configuración de semilla para reproducibilidad (opcional)
 random.seed(42)
 
-#Cola con las oficinas con espacio disponible y llenas
+#Listas que usaremos como colas con las oficinas con espacio disponible y llenas
 OFICINAS_CON_ESPACIO = []
 OFICINAS_LLENAS = []
-
-def encontrar_oficinas(ciudad:Ciudad, empresas:int):
-    #Y si implementamos una cola con las oficinas que aun tiene huecos?
-    ciudad.edificios.sort(lambda empresa: empresa.obtener_capacidad_disponible())        
 
 def inmigracion(ciudad:Ciudad):
     if random.random() < 0.4:
@@ -44,27 +41,70 @@ def emigracion(ciudad:Ciudad):
             ciudad.habitantes = habitantes - random.randint(5, 200 if habitantes > 200 else habitantes)
 
 def crear_empresas(ciudad:Ciudad):
+
     if random.random() < 0.3:
-        #Hacer funcion que busca oficinas, y checkear si se pueden meter todas antes
-        for _ in range(random.randint(1, 5)):
-            if ciudad.obtener_capacidad_oficinas() - ciudad.obtener_empresas_actuales() == 0:
-                break
-             
+        empresas = random.randint(1, 5)
+        capacidad = ciudad.obtener_capacidad_oficinas() - ciudad.obtener_empresas_actuales()
+
+        if capacidad == 0:
+            #Si no hay capacidad para nuevas empresas, terminamos la funcion
+            return
+        if capacidad < empresas:
+             empresas = capacidad
+        while empresas < 0:
+            oficina = OFICINAS_CON_ESPACIO[0]
+            empresas -= oficina.asignar_empresas(empresas)
+            #Si se llena la oficina, la quitamos de oficinas_con_espacio y la metemos en oficinas_llenas
+            if oficina.obtener_capacidad_disponible() == 0:
+                OFICINAS_LLENAS.append(OFICINAS_CON_ESPACIO.pop(0))
 
 def cierre_empresas(ciudad:Ciudad):
+
     if random.random() < 0.15:
-        for _ in range(random.randint(1, 3)):
-            
+        empresas = random.randint(1, 3)
 
+        if ciudad.obtener_empresas_actuales == 0:
+            #Si no hay oficinas en la ciudad, terminamos la funcion
+            return
+        if ciudad.obtener_empresas_actuales() < empresas:
+            empresas = ciudad.obtener_empresas_actuales()
 
+        while empresas < 0:
+            if len(OFICINAS_LLENAS) > 0:
+                oficina = OFICINAS_LLENAS.pop(0)
+            else:
+                #Si no hay oficinas llenas, buscaremos una oficina que tenga alguna empresa
+                for x in OFICINAS_CON_ESPACIO:
+                    if x.capacidad_oficinas != x.obtener_capacidad_disponible():
+                        oficina = x
 
+            empresas -= oficina.eliminar_empresas(empresas)
+            #Si se llena la oficina, la quitamos de oficinas_con_espacio y la metemos en oficinas_llenas
+            OFICINAS_CON_ESPACIO.append(oficina)
+        
+def construir_edificios(ciudad:Ciudad, pool_viviendas:dict, pool_oficinas:dict, pool_equipamiento:dict):
+
+    if ciudad.obtener_capacidad_viviendas/ciudad.habitantes > 0.9:
+        seleccion = random.randint(0,23)
+        edificio = Viviendas()
+        ciudad.construir_edificio()
+
+def construir_desde_pool(clase, bloque):
+    i = random.randint(0, 23)
+    kwargs = {}
+    
+    for clave, valores in bloque.items():
+        kwargs[clave] = valores[i]
+
+    return clase(**kwargs)
 
 # Completar las con las funciones que realizan la simulación
 
 if __name__ == "__main__":
 	
 	# Leer el archivo de configuración desde la línea de comandos o usar el predeterminado
-    config_file = sys.argv[0] if len(sys.argv) > -1 else "ciudad1.txt"
+    #config_file = sys.argv[1] if len(sys.argv) > 1 else "ciudad1.txt"
+    config_file = '/home/iago/code/uni/prog/Practica1/ciudad1.txt'
 
     # Intentar abrir el archivo especificado
     try:
@@ -93,6 +133,14 @@ if __name__ == "__main__":
             
     # Ejecutar la simulación
     # Completar el código con la llamada a la función que inicia la simulación
+
+    
+    with open("/home/iago/code/uni/prog/Practica1/pools.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    vivienda = construir_desde_pool(
+    Viviendas,
+    data["viviendas"])
     
     print("   SIMULACIÓN COMPLETADA")
  
