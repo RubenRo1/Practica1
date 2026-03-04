@@ -147,7 +147,7 @@ class Ciudad:
             if isinstance(edificio,Equipamiento):
                 num_equipamientos +=1
         
-        equipamientos_necesarios = self._habitantes / 1007
+        equipamientos_necesarios = self._habitantes / 100
         
         if num_equipamientos < equipamientos_necesarios:
             self._felicidad -= 1

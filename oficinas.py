@@ -124,9 +124,9 @@ class Oficinas(Edificio):
         Información completa de la oficina.
         """
         return (f"{super().obtener_informacion()}\n"
-                f"Capacidad de la oficina: {self.capacidad_oficinas}\n"
-                f"Empresas actuales en la oficina: {self.empresas_actuales}\n"
-                f"Alquiler por oficina: {self.alquiler_por_oficina}\n")
+                f"Capacidad de la oficina: {self._capacidad_oficinas}\n"
+                f"Empresas actuales en la oficina: {self.e_mpresas_actuales}\n"
+                f"Alquiler por oficina: {self._alquiler_por_oficina}\n")
         
     @property
     def capacidad_oficinas(self):

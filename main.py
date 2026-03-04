@@ -20,25 +20,32 @@ ABITANTES_INICIALES = None
 PRESUPUESTO_INICIAL = None
 
 # Configuración de semilla para reproducibilidad (opcional)
-random.seed(42)
+#random.seed(42)
 
 #Listas que usaremos como colas con las oficinas con espacio disponible y llenas
 OFICINAS_CON_ESPACIO = []
 OFICINAS_LLENAS = []
 
 def inmigracion(ciudad:Ciudad):
+    inmigrantes = 0
     if random.random() < 0.4:
-        ciudad.habitantes = ciudad.habitantes + random.randint(5, 200)
+        inmigrantes = random.randint(5, 200)
+        ciudad.habitantes = ciudad.habitantes + inmigrantes
+    return inmigrantes
 
 def emigracion(ciudad:Ciudad):
     #Almacenamos habitantes en una variable para no estar accediendo constantemente
     habitantes = ciudad.habitantes
+    emigrantes = 0
     if ciudad.felicidad > 40:
         if habitantes > 5 and random.random() < 0.2:
-            ciudad.habitantes = habitantes - random.randint(5, 200 if habitantes > 200 else habitantes)
+            emigrantes = random.randint(5, 200 if habitantes > 200 else habitantes)
     else:
         if habitantes > 5 and random.random() < 0.35:
-            ciudad.habitantes = habitantes - random.randint(5, 200 if habitantes > 200 else habitantes)
+            emigrantes = random.randint(5, 200 if habitantes > 200 else habitantes)
+
+    ciudad.habitantes = habitantes - emigrantes
+    return emigrantes
 
 def crear_empresas(ciudad:Ciudad):
 
@@ -48,49 +55,58 @@ def crear_empresas(ciudad:Ciudad):
 
         if capacidad == 0:
             #Si no hay capacidad para nuevas empresas, terminamos la funcion
-            return False
+            return False, 0
         if capacidad < empresas:
              empresas = capacidad
-        while empresas < 0:
+        
+        i = empresas
+        while i > 0:
             oficina = OFICINAS_CON_ESPACIO[0]
-            empresas -= oficina.asignar_empresas(empresas)
+            i -= oficina.asignar_empresas(i)
             #Si se llena la oficina, la quitamos de oficinas_con_espacio y la metemos en oficinas_llenas
             if oficina.obtener_capacidad_disponible() == 0:
                 OFICINAS_LLENAS.append(OFICINAS_CON_ESPACIO.pop(0))
 
-        return True
-    return False
+        return True, empresas
+    return False, 0
+
+def encontrar_oficinas_con_empresas():
+    if len(OFICINAS_LLENAS) > 0:
+        return OFICINAS_LLENAS.pop(0)
+    
+    #Si no hay oficinas llenas, buscaremos una oficina que tenga alguna empresa
+    for oficina in OFICINAS_CON_ESPACIO:
+        if oficina.capacidad_oficinas != oficina.obtener_capacidad_disponible():
+            return oficina
+            
 
 def cierre_empresas(ciudad:Ciudad):
 
     if random.random() < 0.15:
         empresas = random.randint(1, 3)
 
-        if ciudad.obtener_empresas_actuales == 0:
+        if ciudad.obtener_empresas_actuales() == 0:
             #Si no hay oficinas en la ciudad, terminamos la funcion
-            return
+            return False, 0
         if ciudad.obtener_empresas_actuales() < empresas:
             empresas = ciudad.obtener_empresas_actuales()
 
-        while empresas < 0:
-            if len(OFICINAS_LLENAS) > 0:
-                oficina = OFICINAS_LLENAS.pop(0)
-            else:
-                #Si no hay oficinas llenas, buscaremos una oficina que tenga alguna empresa
-                for x in OFICINAS_CON_ESPACIO:
-                    if x.capacidad_oficinas != x.obtener_capacidad_disponible():
-                        oficina = x
-
-            empresas -= oficina.eliminar_empresas(empresas)
+        i = empresas
+        while i > 0:
+            oficina = encontrar_oficinas_con_empresas()
+            i -= oficina.eliminar_empresas(i)
             #Si se llena la oficina, la quitamos de oficinas_con_espacio y la metemos en oficinas_llenas
-            OFICINAS_CON_ESPACIO.append(oficina)
+            if oficina not in OFICINAS_CON_ESPACIO:
+                OFICINAS_CON_ESPACIO.append(oficina)
+        return True, empresas
+    
+    return False, 0
 
 def construir_desde_pool(clase, bloque):
     i = random.randint(0, 23)
     kwargs = {}
     for clave, valores in bloque.items():
         kwargs[clave] = valores[i]
-
     return clase(**kwargs)
         
 def construir_edificios(ciudad:Ciudad, pools:dict, nuevas_empresas:bool):
@@ -99,7 +115,7 @@ def construir_edificios(ciudad:Ciudad, pools:dict, nuevas_empresas:bool):
 
     if ciudad.obtener_capacidad_viviendas() /ciudad.habitantes > 0.9:
         edificio = construir_desde_pool(Viviendas, pools['viviendas'])
-    elif (ciudad.obtener_capacidad_oficinas() - ciudad.obtener_empresas_actuales()) and nuevas_empresas:
+    elif (ciudad.obtener_capacidad_oficinas() - ciudad.obtener_empresas_actuales()) < 5 and nuevas_empresas:
         edificio = construir_desde_pool(Oficinas, pools['oficinas'])
     elif ciudad.felicidad < 40:
         edificio = construir_desde_pool(Equipamiento, pools['equipamientos'])
@@ -110,6 +126,8 @@ def construir_edificios(ciudad:Ciudad, pools:dict, nuevas_empresas:bool):
 
     if edificio != None:
         ciudad.construir_edificio(edificio)
+        if isinstance(edificio, Oficinas):
+            OFICINAS_CON_ESPACIO.append(edificio)
 
 
 
@@ -135,14 +153,15 @@ def simulacion(ciudad: Ciudad, pools:dict, num_meses: int):
     -------
     None
     """
-    print("\n=== ESTADO INICIAL ===")
-    print(ciudad)
+    data = []
 
     # Construir edificios iniciales: 2 viviendas, 1 oficina, 1 equipamiento
     for _ in range(2):
-        construir_desde_pool(Viviendas, pools['viviendas'])
-    construir_desde_pool(Oficinas, pools['oficinas'])
-    construir_desde_pool(Equipamiento, pools['equipamientos'])
+        ciudad.construir_edificio(construir_desde_pool(Viviendas, pools['viviendas']))
+    oficina = construir_desde_pool(Oficinas, pools['oficinas'])
+    OFICINAS_CON_ESPACIO.append(oficina)
+    ciudad.construir_edificio(oficina)
+    ciudad.construir_edificio(construir_desde_pool(Equipamiento, pools['equipamientos']))
 
     print("\n=== ESTADO INICIAL ===")
     print(ciudad)
@@ -152,10 +171,10 @@ def simulacion(ciudad: Ciudad, pools:dict, num_meses: int):
         print(f"\n--- Mes {mes} ---")
 
         # Eventos aleatorios
-        inmigracion(ciudad)
-        emigracion(ciudad)
-        nuevas_empresas = crear_empresas(ciudad)
-        cierre_empresas(ciudad)
+        inmigrantes = inmigracion(ciudad)
+        emigrantes = emigracion(ciudad)
+        nuevas_empresas, n_empresas = crear_empresas(ciudad)
+        hubo_cierres, n_cierres = cierre_empresas(ciudad)
 
         construir_edificios(ciudad, pools, nuevas_empresas)
 
@@ -167,9 +186,12 @@ def simulacion(ciudad: Ciudad, pools:dict, num_meses: int):
         print(f"Habitantes: {ciudad.habitantes}")
         print(f"Felicidad: {ciudad.felicidad}")
         print(f"Presupuesto: {ciudad.presupuesto}")
-        print(f"Edificios: {[ed.nombre for ed in ciudad.edificios]}")
+        #print(f"Edificios: {[ed.nombre for ed in ciudad.edificios]}")
 
+        data.append([mes, ciudad.habitantes, ciudad.felicidad, ciudad.presupuesto, inmigrantes, emigrantes, 
+                     n_empresas, n_cierres, ciudad.obtener_empresas_actuales(), ciudad.obtener_capacidad_oficinas(), len(ciudad.edificios)])
 
+    return data
 
 # Completar las con las funciones que realizan la simulación
 
@@ -204,15 +226,16 @@ if __name__ == "__main__":
         elif clave == "PRESUPUESTO_INICIAL":
             PRESUPUESTO_INICIAL = int(valor)
             
-    # Ejecutar la simulación
-    # Completar el código con la llamada a la función que inicia la simulación
+    with open("/home/iago/code/uni/prog/Practica1/pools0.json", "r", encoding="utf-8") as f:
+        pools = json.load(f)
 
-    
-    with open("/home/iago/code/uni/prog/Practica1/pools.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
+    ciudad = Ciudad('Villa Vamos Tarde', HABITANTES_INICIALES, 15000000, 20, [])
+    data = simulacion(ciudad, pools, 40)
 
-    ciudad = Ciudad('Villa Vamos Tarde', HABITANTES_INICIALES, 5000000, 20, [])
-    simulacion(ciudad, data, NUM_MESES)
-    
+    #Creacion del dataframe
+    columnas = ['mes', 'habitantes', 'felicidad', 'presupuesto', 'inmigrantes', 
+                'emigracion', 'empresas creadas', 'empresas cerradas', 'empresas totales', 'capacidad de empresas', 'edificios']
+    tabla_simulacion = pd.DataFrame(data, columns=columnas)
+    print(tabla_simulacion)
     print("   SIMULACIÓN COMPLETADA")
  
