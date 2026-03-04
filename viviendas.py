@@ -61,7 +61,7 @@ class Viviendas(Edificio):
         Ingresos totales generados (num_hogares * precio del alquiler).
         """
     
-        return self.num_hogares * Viviendas._PRECIO_ALQUILER
+        return self._num_hogares * self._PRECIO_ALQUILER
     
     def obtener_capacidad_disponible(self):
         """Devuelve la capacidad disponible de la vivienda.
@@ -82,8 +82,8 @@ class Viviendas(Edificio):
         Informacion completa sobre la vivienda
         """
         return(f"{super().obtener_informacion()}\n"
-               f"Capacidad: {self.capacidad}\n"
-               f"Nº de hogares: {self.num_hogares}\n"
+               f"Capacidad: {self._capacidad}\n"
+               f"Nº de hogares: {self._num_hogares}\n"
                f"Precio alquiler: {self._PRECIO_ALQUILER}")
         
     

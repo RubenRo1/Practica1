@@ -48,7 +48,7 @@ def crear_empresas(ciudad:Ciudad):
 
         if capacidad == 0:
             #Si no hay capacidad para nuevas empresas, terminamos la funcion
-            return
+            return False
         if capacidad < empresas:
              empresas = capacidad
         while empresas < 0:
@@ -57,6 +57,9 @@ def crear_empresas(ciudad:Ciudad):
             #Si se llena la oficina, la quitamos de oficinas_con_espacio y la metemos en oficinas_llenas
             if oficina.obtener_capacidad_disponible() == 0:
                 OFICINAS_LLENAS.append(OFICINAS_CON_ESPACIO.pop(0))
+
+        return True
+    return False
 
 def cierre_empresas(ciudad:Ciudad):
 
@@ -81,24 +84,36 @@ def cierre_empresas(ciudad:Ciudad):
             empresas -= oficina.eliminar_empresas(empresas)
             #Si se llena la oficina, la quitamos de oficinas_con_espacio y la metemos en oficinas_llenas
             OFICINAS_CON_ESPACIO.append(oficina)
-        
-def construir_edificios(ciudad:Ciudad, pool_viviendas:dict, pool_oficinas:dict, pool_equipamiento:dict):
-
-    if ciudad.obtener_capacidad_viviendas/ciudad.habitantes > 0.9:
-        seleccion = random.randint(0,23)
-        edificio = Viviendas()
-        ciudad.construir_edificio()
 
 def construir_desde_pool(clase, bloque):
     i = random.randint(0, 23)
     kwargs = {}
-    
     for clave, valores in bloque.items():
         kwargs[clave] = valores[i]
 
     return clase(**kwargs)
+        
+def construir_edificios(ciudad:Ciudad, pools:dict, nuevas_empresas:bool):
 
-def simulacion(ciudad: Ciudad, pool_viviendas: dict, pool_oficinas: dict, pool_equipamiento: dict, num_meses: int):
+    edificio = None
+
+    if ciudad.obtener_capacidad_viviendas() /ciudad.habitantes > 0.9:
+        edificio = construir_desde_pool(Viviendas, pools['viviendas'])
+    elif (ciudad.obtener_capacidad_oficinas() - ciudad.obtener_empresas_actuales()) and nuevas_empresas:
+        edificio = construir_desde_pool(Oficinas, pools['oficinas'])
+    elif ciudad.felicidad < 40:
+        edificio = construir_desde_pool(Equipamiento, pools['equipamientos'])
+    elif ciudad.presupuesto > 3_000_000:
+        tipos_de_edificios = [(Viviendas, 'viviendas'), (Oficinas, 'oficinas'), (Equipamiento, 'equipamientos')]
+        tipo = random.choice(tipos_de_edificios)
+        edificio = construir_desde_pool(tipo[0], pools[tipo[1]])
+
+    if edificio != None:
+        ciudad.construir_edificio(edificio)
+
+
+
+def simulacion(ciudad: Ciudad, pools:dict, num_meses: int):
     """
     Ejecuta la simulación mes a mes de la ciudad, aplicando eventos aleatorios
     y actualizando el estado de la ciudad.
@@ -125,9 +140,12 @@ def simulacion(ciudad: Ciudad, pool_viviendas: dict, pool_oficinas: dict, pool_e
 
     # Construir edificios iniciales: 2 viviendas, 1 oficina, 1 equipamiento
     for _ in range(2):
-        ciudad.construir_edificio(construir_desde_pool(Viviendas, pool_viviendas))
-    ciudad.construir_edificio(construir_desde_pool(Oficinas, pool_oficinas))
-    ciudad.construir_edificio(construir_desde_pool(Equipamiento, pool_equipamiento))
+        construir_desde_pool(Viviendas, pools['viviendas'])
+    construir_desde_pool(Oficinas, pools['oficinas'])
+    construir_desde_pool(Equipamiento, pools['equipamientos'])
+
+    print("\n=== ESTADO INICIAL ===")
+    print(ciudad)
 
     # Bucle de simulación mes a mes
     for mes in range(1, num_meses + 1):
@@ -136,9 +154,10 @@ def simulacion(ciudad: Ciudad, pool_viviendas: dict, pool_oficinas: dict, pool_e
         # Eventos aleatorios
         inmigracion(ciudad)
         emigracion(ciudad)
-        crear_empresas(ciudad)
+        nuevas_empresas = crear_empresas(ciudad)
         cierre_empresas(ciudad)
-        construir_edificios(ciudad, pool_viviendas, pool_oficinas, pool_equipamiento)
+
+        construir_edificios(ciudad, pools, nuevas_empresas)
 
         # Actualización de la ciudad
         ciudad.actualizar_presupuesto()
@@ -158,7 +177,7 @@ if __name__ == "__main__":
 	
 	# Leer el archivo de configuración desde la línea de comandos o usar el predeterminado
     #config_file = sys.argv[1] if len(sys.argv) > 1 else "ciudad1.txt"
-    config_file = 'ciudad1.txt'
+    config_file = '/home/iago/code/uni/prog/Practica1/ciudad1.txt'
 
     # Intentar abrir el archivo especificado
     try:
@@ -189,12 +208,11 @@ if __name__ == "__main__":
     # Completar el código con la llamada a la función que inicia la simulación
 
     
-    with open("pools.json", "r", encoding="utf-8") as f:
+    with open("/home/iago/code/uni/prog/Practica1/pools.json", "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    vivienda = construir_desde_pool(
-    Viviendas,
-    data["viviendas"])
+    ciudad = Ciudad('Villa Vamos Tarde', HABITANTES_INICIALES, 5000000, 20, [])
+    simulacion(ciudad, data, NUM_MESES)
     
     print("   SIMULACIÓN COMPLETADA")
  

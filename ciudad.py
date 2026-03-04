@@ -83,9 +83,9 @@ class Ciudad:
         True si se construyó el edificio, False si no hay presupuesto suficiente.
         """
         
-        if self.presupuesto > edificio.coste_construccion:
-            self.edificios.append(edificio)
-            self.presupuesto -= edificio.coste_construccion
+        if self._presupuesto > edificio.coste_construccion:
+            self._edificios.append(edificio)
+            self._presupuesto -= edificio.coste_construccion
             return True
         return False
         
@@ -103,11 +103,11 @@ class Ciudad:
         ingresos = 0
         mantenimiento = 0
         
-        for edificio in self.edificios:
+        for edificio in self._edificios:
             ingresos += edificio.calcular_ingresos()
             mantenimiento += edificio.coste_mantenimiento 
             
-        self.presupuesto += ingresos - mantenimiento + self.IMPUESTO_POR_HABITANTE * self.habitantes
+        self.presupuesto += ingresos - mantenimiento + self._IMPUESTO_POR_HABITANTE * self._habitantes
 
     def actualizar_felicidad(self):
         """Calcula y actualiza la felicidad de la población.
@@ -121,40 +121,40 @@ class Ciudad:
         None
         """
         
-        if self.habitantes == 0:
-            self.felicidad = 50
+        if self._habitantes == 0:
+            self._felicidad = 50
             return 
         
         felicidad_total = 0
         num_equipamientos = 0
         
-        for edificio in self.edificios:
+        for edificio in self._edificios:
             felicidad_total += edificio.impacto_felicidad
     
-        self.felicidad += felicidad_total
+        self._felicidad += felicidad_total
         capacidad_vivienda = self.obtener_capacidad_viviendas()
         
         if capacidad_vivienda == 0:
-            self.felicidad -= 30
+            self._felicidad -= 30
         else:
-            ratio = self.habitantes/capacidad_vivienda
+            ratio = self._habitantes/capacidad_vivienda
             if ratio > 0.85:
-                self.felicidad -= 10
+                self._felicidad -= 10
             else:
-                self.felicidad +=1
+                self._felicidad +=1
                 
-        for edificio in self.edificios:
+        for edificio in self._edificios:
             if isinstance(edificio,Equipamiento):
                 num_equipamientos +=1
         
-        equipamientos_necesarios = self.habitantes / 1007
+        equipamientos_necesarios = self._habitantes / 1007
         
         if num_equipamientos < equipamientos_necesarios:
-            self.felicidad -= 1
+            self._felicidad -= 1
         else:
-            self.felicidad += 1
+            self._felicidad += 1
 
-        self.felicidad = max(0, min(100, self.felicidad))        
+        self._felicidad = max(0, min(100, self._felicidad))        
     
     def obtener_capacidad_viviendas(self) -> int:
         """Devuelve la capacidad total de todas las viviendas de la ciudad.
@@ -165,7 +165,7 @@ class Ciudad:
         Capacidad total de todas las viviendas.
         """
         capacidad_total = 0
-        for edificio in self.edificios:
+        for edificio in self._edificios:
             if isinstance(edificio, Viviendas):
                 capacidad_total += edificio.capacidad
             
@@ -180,7 +180,7 @@ class Ciudad:
         Capacidad total de oficinas.
         """
         capacidad_total = 0
-        for edificio in self.edificios:
+        for edificio in self._edificios:
             if isinstance(edificio, Oficinas):
                 capacidad_total += edificio.capacidad_oficinas
         
@@ -195,7 +195,7 @@ class Ciudad:
         Número total de empresas.
         """
         empresas = 0
-        for edificio in self.edificios:
+        for edificio in self._edificios:
             if isinstance(edificio, Oficinas):
                 empresas += edificio.empresas_actuales
                 
@@ -212,10 +212,10 @@ class Ciudad:
         edificios_info = "\n".join([edificio.nombre for edificio in self.edificios])
             
         return (
-        f"Ciudad: {self.nombre}\n"
-        f"Habitantes: {self.habitantes}\n"
-        f"Presupuesto: {self.presupuesto}\n"
-        f"Felicidad: {self.felicidad}\n"
+        f"Ciudad: {self._nombre}\n"
+        f"Habitantes: {self._habitantes}\n"
+        f"Presupuesto: {self._presupuesto}\n"
+        f"Felicidad: {self._felicidad}\n"
         f"Edificios:\n{edificios_info}"
     )
 
