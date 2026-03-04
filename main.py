@@ -98,13 +98,67 @@ def construir_desde_pool(clase, bloque):
 
     return clase(**kwargs)
 
+def simulacion(ciudad: Ciudad, pool_viviendas: dict, pool_oficinas: dict, pool_equipamiento: dict, num_meses: int):
+    """
+    Ejecuta la simulación mes a mes de la ciudad, aplicando eventos aleatorios
+    y actualizando el estado de la ciudad.
+
+    Parameters
+    ----------
+    ciudad : Ciudad
+        Objeto Ciudad sobre el que se ejecuta la simulación.
+    pool_viviendas : dict
+        Diccionario con los datos de viviendas para construir desde el pool.
+    pool_oficinas : dict
+        Diccionario con los datos de oficinas para construir desde el pool.
+    pool_equipamiento : dict
+        Diccionario con los datos de equipamientos para construir desde el pool.
+    num_meses : int
+        Número de meses a simular.
+
+    Returns
+    -------
+    None
+    """
+    print("\n=== ESTADO INICIAL ===")
+    print(ciudad)
+
+    # Construir edificios iniciales: 2 viviendas, 1 oficina, 1 equipamiento
+    for _ in range(2):
+        ciudad.construir_edificio(construir_desde_pool(Viviendas, pool_viviendas))
+    ciudad.construir_edificio(construir_desde_pool(Oficinas, pool_oficinas))
+    ciudad.construir_edificio(construir_desde_pool(Equipamiento, pool_equipamiento))
+
+    # Bucle de simulación mes a mes
+    for mes in range(1, num_meses + 1):
+        print(f"\n--- Mes {mes} ---")
+
+        # Eventos aleatorios
+        inmigracion(ciudad)
+        emigracion(ciudad)
+        crear_empresas(ciudad)
+        cierre_empresas(ciudad)
+        construir_edificios(ciudad, pool_viviendas, pool_oficinas, pool_equipamiento)
+
+        # Actualización de la ciudad
+        ciudad.actualizar_presupuesto()
+        ciudad.actualizar_felicidad()
+
+        # Mostrar estado mensual resumido
+        print(f"Habitantes: {ciudad.habitantes}")
+        print(f"Felicidad: {ciudad.felicidad}")
+        print(f"Presupuesto: {ciudad.presupuesto}")
+        print(f"Edificios: {[ed.nombre for ed in ciudad.edificios]}")
+
+
+
 # Completar las con las funciones que realizan la simulación
 
 if __name__ == "__main__":
 	
 	# Leer el archivo de configuración desde la línea de comandos o usar el predeterminado
     #config_file = sys.argv[1] if len(sys.argv) > 1 else "ciudad1.txt"
-    config_file = '/home/iago/code/uni/prog/Practica1/ciudad1.txt'
+    config_file = 'ciudad1.txt'
 
     # Intentar abrir el archivo especificado
     try:
@@ -135,7 +189,7 @@ if __name__ == "__main__":
     # Completar el código con la llamada a la función que inicia la simulación
 
     
-    with open("/home/iago/code/uni/prog/Practica1/pools.json", "r", encoding="utf-8") as f:
+    with open("pools.json", "r", encoding="utf-8") as f:
         data = json.load(f)
 
     vivienda = construir_desde_pool(
