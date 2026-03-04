@@ -95,22 +95,8 @@ class Oficinas(Edificio):
                     
         return empresas_borrar
         
-    def __str__(self):
-        """Devuelve la informacion del edificio.
-
-        Returns
-        -------
-        str
-        Información completa del edificio.
-        """
-        return self.obtener_informacion()
-        
     def calcular_ingresos(self):
         """Calcula los ingresos generados por las oficinas.
-
-        Parameters
-        ----------
-        None.
 
         Returns
         -------
@@ -122,10 +108,6 @@ class Oficinas(Edificio):
     def obtener_capacidad_disponible(self):
         """Devuelve la capacidad disponible de oficinas.
 
-        Parameters
-        ----------
-        None.
-
         Returns
         -------
         int
@@ -133,6 +115,19 @@ class Oficinas(Edificio):
         """
         return self._capacidad_oficinas - self._empresas_actuales
     
+    def __str__(self):
+        """Devuelve toda la informacion sobre la oficia.
+
+        Returns
+        -------
+        str
+        Información completa de la oficina.
+        """
+        return (f"{super().obtener_informacion()}\n"
+                f"Capacidad de la oficina: {self.capacidad_oficinas}\n"
+                f"Empresas actuales en la oficina: {self.empresas_actuales}\n"
+                f"Alquiler por oficina: {self.alquiler_por_oficina}\n")
+        
     @property
     def capacidad_oficinas(self):
        return self._capacidad_oficinas

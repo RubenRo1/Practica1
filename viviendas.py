@@ -55,10 +55,6 @@ class Viviendas(Edificio):
     def calcular_ingresos(self):
         """Calcula los ingresos generados por la vivienda.
 
-        Parameters
-        ----------
-        None.
-
         Returns
         -------
         int
@@ -70,16 +66,26 @@ class Viviendas(Edificio):
     def obtener_capacidad_disponible(self):
         """Devuelve la capacidad disponible de la vivienda.
 
-        Parameters
-        ----------
-        None.
-
         Returns
         -------
         int
         Siempre devuelve 0 para viviendas.
         """
         return 0
+    
+    def __str__(self):
+        """Devuelve toda la informacion sobre la vivienda
+        
+        Returns
+        -------
+        str
+        Informacion completa sobre la vivienda
+        """
+        return(f"{super().obtener_informacion()}\n"
+               f"Capacidad: {self.capacidad}\n"
+               f"Nº de hogares: {self.num_hogares}\n"
+               f"Precio alquiler: {self._PRECIO_ALQUILER}")
+        
     
     @property
     def capacidad(self):

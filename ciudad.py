@@ -200,6 +200,24 @@ class Ciudad:
                 empresas += edificio.empresas_actuales
                 
         return empresas
+    
+    def __str__(self):
+        """Devuelve toda la informacion sobre la ciudad
+        
+        Returns
+        -------
+        str
+        Informacion completa sobre la ciudad
+        """
+        edificios_info = "\n".join([edificio.nombre for edificio in self.edificios])
+            
+        return (
+        f"Ciudad: {self.nombre}\n"
+        f"Habitantes: {self.habitantes}\n"
+        f"Presupuesto: {self.presupuesto}\n"
+        f"Felicidad: {self.felicidad}\n"
+        f"Edificios:\n{edificios_info}"
+    )
 
     @property
     def nombre(self):

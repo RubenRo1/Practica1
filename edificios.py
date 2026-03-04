@@ -5,7 +5,7 @@ class Edificio(ABC):
 
      Esta clase sirve como base para todos los edificios dentro del sistema.
      Proporciona los atributos comunes a todos los edificios y define métodos 
-     abstractos que deben serimplementados por cada tipo de edificio específico.
+     abstractos que deben ser implementados por cada tipo de edificio específico.
      
     Attributes
     ----------
@@ -56,10 +56,6 @@ class Edificio(ABC):
         """
         Devuelve toda la información del edificio.
 
-        Parameters
-        ----------
-        None.
-
         Returns
         -------
         str
@@ -72,12 +68,24 @@ class Edificio(ABC):
             f"Impacto felicidad: {self._impacto_felicidad}"
             )
     
+    def __str__(self):
+        """Devuelve toda la informacion sobre el edificio
+        
+        Returns
+        -------
+        str
+        Informacion completa sobre el edificio
+        """
+        return(f"{self.obtener_informacion()}")
+    
     @abstractmethod
     def calcular_ingresos(self):
+        """Calcula los ingresos generados por el edificio. Debe implementarse en la subclase."""
         pass
     
     @abstractmethod
     def obtener_capacidad_disponible(self):
+        """Devuelve la capacidad disponible del edificio. Debe implementarse en la subclase."""
         pass
     
     @property
