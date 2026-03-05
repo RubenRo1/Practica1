@@ -87,7 +87,7 @@ def cierre_empresas(ciudad:Ciudad):
 
         if ciudad.obtener_empresas_actuales() == 0:
             #Si no hay oficinas en la ciudad, terminamos la funcion
-            return False, 0
+            return 0
         if ciudad.obtener_empresas_actuales() < empresas:
             empresas = ciudad.obtener_empresas_actuales()
 
@@ -98,9 +98,9 @@ def cierre_empresas(ciudad:Ciudad):
             #Si se llena la oficina, la quitamos de oficinas_con_espacio y la metemos en oficinas_llenas
             if oficina not in OFICINAS_CON_ESPACIO:
                 OFICINAS_CON_ESPACIO.append(oficina)
-        return True, empresas
+        return empresas
     
-    return False, 0
+    return 0
 
 def construir_desde_pool(clase, bloque):
     i = random.randint(0, 23)
@@ -128,6 +128,7 @@ def construir_edificios(ciudad:Ciudad, pools:dict, nuevas_empresas:bool):
         ciudad.construir_edificio(edificio)
         if isinstance(edificio, Oficinas):
             OFICINAS_CON_ESPACIO.append(edificio)
+    return str(type(edificio))
 
 
 
@@ -140,12 +141,8 @@ def simulacion(ciudad: Ciudad, pools:dict, num_meses: int):
     ----------
     ciudad : Ciudad
         Objeto Ciudad sobre el que se ejecuta la simulación.
-    pool_viviendas : dict
-        Diccionario con los datos de viviendas para construir desde el pool.
-    pool_oficinas : dict
-        Diccionario con los datos de oficinas para construir desde el pool.
-    pool_equipamiento : dict
-        Diccionario con los datos de equipamientos para construir desde el pool.
+    pools : dict
+        Diccionario con los datos de las clases para construirlas.
     num_meses : int
         Número de meses a simular.
 
@@ -154,6 +151,10 @@ def simulacion(ciudad: Ciudad, pools:dict, num_meses: int):
     None
     """
     data = []
+    tipos_de_edificio = {"<class 'NoneType'>":'Ninguno',
+                         "<class 'equipamiento.Equipamiento'>":'Equipamientos',
+                         "<class 'oficinas.Oficinas'>":'Oficinas',
+                         "<class 'viviendas.Viviendas'>":'Viviendas'}
 
     # Construir edificios iniciales: 2 viviendas, 1 oficina, 1 equipamiento
     for _ in range(2):
@@ -174,26 +175,37 @@ def simulacion(ciudad: Ciudad, pools:dict, num_meses: int):
         inmigrantes = inmigracion(ciudad)
         emigrantes = emigracion(ciudad)
         nuevas_empresas, n_empresas = crear_empresas(ciudad)
-        hubo_cierres, n_cierres = cierre_empresas(ciudad)
+        n_cierres = cierre_empresas(ciudad)
 
-        construir_edificios(ciudad, pools, nuevas_empresas)
+        edificio = construir_edificios(ciudad, pools, nuevas_empresas)
 
         # Actualización de la ciudad
         ciudad.actualizar_presupuesto()
         ciudad.actualizar_felicidad()
 
         # Mostrar estado mensual resumido
-        print(f"Habitantes: {ciudad.habitantes}")
-        print(f"Felicidad: {ciudad.felicidad}")
-        print(f"Presupuesto: {ciudad.presupuesto}")
+        print(f"Habitantes:            {ciudad.habitantes}")
+        print(f"Felicidad:             {ciudad.felicidad}")
+        print(f"Presupuesto:           {ciudad.presupuesto}")
+
+        print(f'Llegada de habitantes: {inmigrantes}')
+        print(f'Salida de habitantes:  {emigrantes}')
+        print(f'Empresas creadas:      {n_empresas}')
+        print(f'Empresas cerradas:     {n_cierres}')
+        print(f'Edificios constridos:  {tipos_de_edificio[edificio]}')
         #print(f"Edificios: {[ed.nombre for ed in ciudad.edificios]}")
 
-        data.append([mes, ciudad.habitantes, ciudad.felicidad, ciudad.presupuesto, inmigrantes, emigrantes, 
+        data.append([ciudad.habitantes, ciudad.felicidad, ciudad.presupuesto, inmigrantes, emigrantes, 
                      n_empresas, n_cierres, ciudad.obtener_empresas_actuales(), ciudad.obtener_capacidad_oficinas(), len(ciudad.edificios)])
 
     return data
 
-# Completar las con las funciones que realizan la simulación
+def analisis_estadistico(data:list, columnas:list, estadisticas:list):
+    dataframe = pd.DataFrame(data, columns=columnas)
+
+    argumentos = dict.fromkeys(columnas, estadisticas)
+    analisis = dataframe.agg(argumentos)
+    print(analisis)
 
 if __name__ == "__main__":
 	
@@ -226,16 +238,22 @@ if __name__ == "__main__":
         elif clave == "PRESUPUESTO_INICIAL":
             PRESUPUESTO_INICIAL = int(valor)
             
-    with open("/home/iago/code/uni/prog/Practica1/pools0.json", "r", encoding="utf-8") as f:
+    with open("/home/iago/code/uni/prog/Practica1/pools1.json", "r", encoding="utf-8") as f:
         pools = json.load(f)
 
     ciudad = Ciudad('Villa Vamos Tarde', HABITANTES_INICIALES, 15000000, 20, [])
     data = simulacion(ciudad, pools, 40)
 
-    #Creacion del dataframe
-    columnas = ['mes', 'habitantes', 'felicidad', 'presupuesto', 'inmigrantes', 
-                'emigracion', 'empresas creadas', 'empresas cerradas', 'empresas totales', 'capacidad de empresas', 'edificios']
-    tabla_simulacion = pd.DataFrame(data, columns=columnas)
-    print(tabla_simulacion)
+    #Analisis estadistico de la simulacion
+
+    columnas = ['habitantes', 'felicidad', 'presupuesto', 'inmigrantes', 
+                'emigrantes', 'empresas creadas', 'empresas cerradas', 
+                'empresas totales', 'capacidad de empresas', 'edificios']
+    
+    estadisticas = ["mean","std", 'max', 'min']
+    
+    print(f'\n\n--- Estadisticas de los {NUM_MESES} meses de simulación ---\n')
+    analisis_estadistico(data, columnas, estadisticas)
+
     print("   SIMULACIÓN COMPLETADA")
  
