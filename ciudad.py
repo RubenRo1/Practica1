@@ -41,7 +41,7 @@ class Ciudad:
         Devuelve el número total de empresas en todas las oficinas.
     """
     
-    def __init__(self, nombre:str, habitantes:int, presupuesto:int, felicidad:int, edificios:list):
+    def __init__(self, nombre:str, habitantes:int, presupuesto:int, felicidad=50, edificios=None):
         
         """Inicializa los atributos de la ciudad.
 
@@ -54,9 +54,9 @@ class Ciudad:
         presupuesto : int
             Presupuesto inicial.
         felicidad : int
-            Nivel inicial de felicidad (0-100).
+            Nivel inicial de felicidad (0-100) default 50.
         edificios : list
-            Lista inicial de edificios.
+            Lista inicial de edificios, default None.
 
         Returns
         -------
@@ -66,7 +66,7 @@ class Ciudad:
         self._habitantes = habitantes
         self._presupuesto = presupuesto
         self._felicidad = max(0, min(100,felicidad))
-        self._edificios = edificios
+        self._edificios = [] if edificios == None else edificios
         self._IMPUESTO_POR_HABITANTE = 500
 
     def construir_edificio(self,edificio: Edificio) -> bool:
@@ -82,8 +82,10 @@ class Ciudad:
         bool
         True si se construyó el edificio, False si no hay presupuesto suficiente.
         """
+        if not isinstance(edificio, Edificio):
+            raise TypeError
         
-        if self._presupuesto > edificio.coste_construccion:
+        if self._presupuesto >= edificio.coste_construccion:
             self._edificios.append(edificio)
             self._presupuesto -= edificio.coste_construccion
             return True
@@ -209,7 +211,7 @@ class Ciudad:
         str
         Informacion completa sobre la ciudad
         """
-        edificios_info = "\n".join([edificio.nombre for edificio in self.edificios])
+        edificios_info = "\n".join([edificio.nombre for edificio in self._edificios])
             
         return (
         f"Ciudad: {self._nombre}\n"
@@ -224,6 +226,8 @@ class Ciudad:
         return self._nombre
     @nombre.setter
     def nombre(self,nombre):
+        if nombre == '' or not isinstance(nombre, str):
+            raise ValueError
         self._nombre = nombre
 
     @property
@@ -231,6 +235,8 @@ class Ciudad:
         return self._habitantes
     @habitantes.setter
     def habitantes(self,habitantes):
+        if habitantes < 0:
+            raise ValueError
         self._habitantes = habitantes
     
     @property
@@ -245,7 +251,7 @@ class Ciudad:
         return self._felicidad
     @felicidad.setter
     def felicidad(self,felicidad):
-        self._felicidad = felicidad
+        self._felicidad = max(0, min(100, felicidad))
     
     @property
     def edificios(self):

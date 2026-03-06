@@ -24,23 +24,23 @@ class Viviendas(Edificio):
         Devuelve la capacidad disponible de la vivienda (siempre 0).     
     """
         
-    def __init__(self,capacidad: int, num_hogares: int, nombre : str, coste_construccion: int, coste_mantenimiento: int ,impacto_felicidad: int):
+    def __init__(self,nombre:str, coste_construccion:int, coste_mantenimiento:str, impacto_felicidad:int, capacidad:int, num_hogares:int):
         """Asigna atributos al objeto.
 
         Parameters
         ----------
-        capacidad : int
-            Capacidad máxima de la vivienda.
-        num_hogares : int
-            Número inicial de hogares.
         nombre : str
-            Nombre del edificio.
+            Nombre de la vivienda
         coste_construccion : int
             Coste de construcción del edificio.
         coste_mantenimiento : int
             Coste de mantenimiento del edificio.
         impacto_felicidad : int
             Impacto en la felicidad de la población.
+        capacidad : int
+            Capacidad máxima de la vivienda.
+        num_hogares : int
+            Número inicial de hogares.
 
         Returns
         -------
@@ -92,6 +92,8 @@ class Viviendas(Edificio):
         return self._capacidad
     @capacidad.setter
     def capacidad(self,capacidad):
+        if capacidad < 0:
+            raise ValueError
         self._capacidad = capacidad
 
     @property
@@ -99,4 +101,6 @@ class Viviendas(Edificio):
         return self._num_hogares
     @num_hogares.setter
     def num_hogares(self, num_hogares):
+        if num_hogares < 0:
+            raise ValueError
         self._num_hogares = num_hogares

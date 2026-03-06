@@ -217,8 +217,8 @@ def construir_edificios(ciudad:Ciudad, pools:dict, nuevas_empresas:bool):
 
     Returns
     -------
-    edificio : String
-        Tipo del edificio construido. En caso de que no se construya nada, devolvera NoneType
+    String
+        String con el tipo de edificio
     """
 
     edificio = None
@@ -236,7 +236,8 @@ def construir_edificios(ciudad:Ciudad, pools:dict, nuevas_empresas:bool):
 
     #Solo construimos el edificio si se ha cumplido alguna de las condiciones
     if edificio != None:
-        ciudad.construir_edificio(edificio)
+        if not ciudad.construir_edificio(edificio):
+            edificio = None
         #Si el edificio es una oficina, lo añadimos a la lista de oficinas con espacio
         if isinstance(edificio, Oficinas):
             OFICINAS_CON_ESPACIO.append(edificio)
@@ -266,6 +267,7 @@ def simulacion(ciudad: Ciudad, pools:dict, num_meses: int):
     """
 
     data = []
+    #Diccionario con las clases de edificio, para poder imprimir su tipo
     tipos_de_edificio = {"<class 'NoneType'>":'Ninguno',
                          "<class 'equipamiento.Equipamiento'>":'Equipamientos',
                          "<class 'oficinas.Oficinas'>":'Oficinas',
@@ -307,8 +309,7 @@ def simulacion(ciudad: Ciudad, pools:dict, num_meses: int):
         print(f'Salida de habitantes:  {emigrantes}')
         print(f'Empresas creadas:      {n_empresas}')
         print(f'Empresas cerradas:     {n_cierres}')
-        print(f'Edificios constridos:  {tipos_de_edificio[edificio]}')
-        #print(f"Edificios: {[ed.nombre for ed in ciudad.edificios]}")
+        print(f'Edificios construidos:  {tipos_de_edificio[edificio]}')
 
         data.append([ciudad.habitantes, ciudad.felicidad, ciudad.presupuesto, inmigrantes, emigrantes, 
                      n_empresas, n_cierres, ciudad.obtener_empresas_actuales(), ciudad.obtener_capacidad_oficinas(), len(ciudad.edificios)])
@@ -368,7 +369,8 @@ if __name__ == "__main__":
             HABITANTES_INICIALES = int(valor)
         elif clave == "PRESUPUESTO_INICIAL":
             PRESUPUESTO_INICIAL = int(valor)
-            
+    
+    #Cargamos el json con la pool de datos para crear edificios
     with open("/home/iago/code/uni/prog/Practica1/pools1.json", "r", encoding="utf-8") as f:
         pools = json.load(f)
 

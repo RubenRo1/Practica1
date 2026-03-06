@@ -27,17 +27,11 @@ class Oficinas(Edificio):
     obtener_capacidad_disponible()
         Devuelve la capacidad disponible de oficinas.   
     """
-    def __init__(self, capacidad_oficinas:int, alquiler_por_oficina:int, nombre:str, coste_construccion:int, coste_mantenimiento:int ,impacto_felicidad:int):
+    def __init__(self, nombre:str, coste_construccion:int, coste_mantenimiento:int, impacto_felicidad:int, capacidad_oficinas:int ,alquiler_por_oficina:int):
         """Asigna atributos al objeto.
 
         Parameters
         ----------
-        capacidad_oficinas : int
-            Capacidad máxima de las oficinas.
-        empresas_actuales : int
-            Número inicial de empresas.
-        alquiler_por_oficina : int
-            Precio del alquiler por oficina.
         nombre : str
             Nombre del edificio.
         coste_construccion : int
@@ -46,6 +40,10 @@ class Oficinas(Edificio):
             Coste de mantenimiento.
         impacto_felicidad : int
             Impacto en la felicidad de la población.
+        capacidad_oficinas : int
+            Capacidad máxima de las oficinas.
+        alquiler_por_oficina : int
+            Precio del alquiler por oficina.
 
         Returns
         -------
@@ -133,6 +131,8 @@ class Oficinas(Edificio):
        return self._capacidad_oficinas
     @capacidad_oficinas.setter   
     def capacidad_oficinas(self,capacidad_oficinas):
+        if capacidad_oficinas < 0:
+            raise ValueError
         self._capacidad_oficinas = capacidad_oficinas
 
     @property
@@ -140,6 +140,8 @@ class Oficinas(Edificio):
        return self._empresas_actuales
     @empresas_actuales.setter    
     def empresas_actuales(self,empresas_actuales):
+        if empresas_actuales < 0:
+            raise ValueError
         self._empresas_actuales = empresas_actuales 
     
     @property
@@ -147,4 +149,6 @@ class Oficinas(Edificio):
        return self._alquiler_por_oficina
     @alquiler_por_oficina.setter
     def alquiler_por_oficina(self,alquiler_por_oficina):
+        if alquiler_por_oficina < 0:
+            raise ValueError
         self._alquiler_por_oficina = alquiler_por_oficina

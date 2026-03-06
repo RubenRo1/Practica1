@@ -21,7 +21,7 @@ class Equipamiento(Edificio):
     obtener_capacidad_disponible()
         Devuelve la capacidad de uso del equipamiento.
     """
-    def __init__(self, tipo: str, capacidad_uso: int, nombre: str, coste_construccion: int, coste_mantenimiento: int ,impacto_felicidad: int):
+    def __init__(self, nombre: str, coste_construccion: int, coste_mantenimiento: str, impacto_felicidad: int, tipo: str ,capacidad_uso: int):
         """Asigna atributos al objeto.
 
         Parameters

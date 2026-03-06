@@ -93,6 +93,8 @@ class Edificio(ABC):
         return self._nombre
     @nombre.setter
     def nombre(self,nombre):
+        if nombre == ''or not isinstance(nombre, str):
+            raise ValueError
         self._nombre = nombre
     
     @property
@@ -100,6 +102,8 @@ class Edificio(ABC):
         return self._coste_construccion
     @coste_construccion.setter
     def coste_construccion(self,coste_construccion):
+        if coste_construccion < 0:
+            raise ValueError
         self._coste_construccion = coste_construccion
     
     @property
@@ -107,6 +111,8 @@ class Edificio(ABC):
         return self._coste_mantenimiento
     @coste_mantenimiento.setter
     def set_coste_mantenimiento(self,coste_mantenimiento):
+        if coste_mantenimiento < 0:
+            raise ValueError
         self._coste_mantenimiento = coste_mantenimiento
         
     @property
@@ -114,4 +120,6 @@ class Edificio(ABC):
         return self._impacto_felicidad
     @impacto_felicidad.setter
     def impacto_felicidad(self,impacto_felicidad):
+        if impacto_felicidad < 0:
+            raise ValueError
         self._impacto_felicidad = impacto_felicidad    
