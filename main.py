@@ -223,7 +223,7 @@ def construir_edificios(ciudad:Ciudad, pools:dict, nuevas_empresas:bool):
 
     edificio = None
 
-    if ciudad.obtener_capacidad_viviendas() /ciudad.habitantes > 0.9:
+    if ciudad.obtener_capacidad_viviendas() / ciudad.habitantes > 0.9:
         edificio = construir_desde_pool(Viviendas, pools['viviendas'])
     elif (ciudad.obtener_capacidad_oficinas() - ciudad.obtener_empresas_actuales()) < 5 and nuevas_empresas:
         edificio = construir_desde_pool(Oficinas, pools['oficinas'])
@@ -304,13 +304,18 @@ def simulacion(ciudad: Ciudad, pools:dict, num_meses: int):
         print(f"Habitantes:            {ciudad.habitantes}")
         print(f"Felicidad:             {ciudad.felicidad}")
         print(f"Presupuesto:           {ciudad.presupuesto}")
+        print(f"Número de edificios:   {len(ciudad.edificios)}")
 
         print(f'Llegada de habitantes: {inmigrantes}')
         print(f'Salida de habitantes:  {emigrantes}')
         print(f'Empresas creadas:      {n_empresas}')
         print(f'Empresas cerradas:     {n_cierres}')
-        print(f'Edificios construidos:  {tipos_de_edificio[edificio]}')
+        print(f'Edificios construidos: {tipos_de_edificio[edificio]}')
 
+        #Descomentar el input si queremos realizar la simulacion mes a mes
+        input()
+
+        #Vamos acumulando los datos con los que haremos el analisis estadistico despues
         data.append([ciudad.habitantes, ciudad.felicidad, ciudad.presupuesto, inmigrantes, emigrantes, 
                      n_empresas, n_cierres, ciudad.obtener_empresas_actuales(), ciudad.obtener_capacidad_oficinas(), len(ciudad.edificios)])
 
@@ -342,8 +347,7 @@ def analisis_estadistico(data:list, columnas:list, estadisticas:list):
 if __name__ == "__main__":
 	
 	# Leer el archivo de configuración desde la línea de comandos o usar el predeterminado
-    #config_file = sys.argv[1] if len(sys.argv) > 1 else "ciudad1.txt"
-    config_file = '/home/iago/code/uni/prog/Practica1/ciudad1.txt'
+    config_file = sys.argv[1] if len(sys.argv) > 1 else "ciudad1.txt"
 
     # Intentar abrir el archivo especificado
     try:
@@ -371,10 +375,10 @@ if __name__ == "__main__":
             PRESUPUESTO_INICIAL = int(valor)
     
     #Cargamos el json con la pool de datos para crear edificios
-    with open("/home/iago/code/uni/prog/Practica1/pools1.json", "r", encoding="utf-8") as f:
+    with open("pools1.json", "r", encoding="utf-8") as f:
         pools = json.load(f)
 
-    ciudad = Ciudad('Villa Vamos Tarde', HABITANTES_INICIALES, 15000000, 20, [])
+    ciudad = Ciudad(NOMBRE_CIUDAD, HABITANTES_INICIALES, PRESUPUESTO_INICIAL)
     data = simulacion(ciudad, pools, NUM_MESES)
 
     #Analisis estadistico de la simulacion
