@@ -10,12 +10,24 @@ suma([Head|Tail],Result) :-
 
 intervalo(X,X,[X]).
 
+intervalo(A,B,[]):-
+    A > B.
+
 intervalo(A,B,[A|Tail]) :-
     B > A,
     Siguiente is A + 1,
     intervalo(Siguiente,B,Tail).
 
-intervalo(A,B,[]):-
-    A > B.
+
+inserta(X,[],[X]).
+
+inserta(D,[Head|Tail],[D, Head|Tail]) :-
+    D @< Head.
+
+inserta(D,[Head|Tail],[Head|Resto]):-
+    D @> Head,
+    inserta(D,Tail,Resto).
+        
+
 
 
