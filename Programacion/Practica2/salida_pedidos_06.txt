@@ -1,0 +1,32 @@
+tiempo 2: entrada de pedido P01 de comida rapida-prioritario, duración:20
+tiempo 2: inicio reparto P01 que entró en tiempo 2, duración 20
+tiempo 4: entrada de pedido P02 de comida tradicional-prioritario, duración:20
+tiempo 4: inicio reparto P02 que entró en tiempo 4, duración 20
+tiempo 6: entrada de pedido P03 de comida rapida-normal, duración:1
+tiempo 8: entrada de pedido P04 de comida tradicional-prioritario, duración:1
+tiempo 10: entrada de pedido P05 de comida rapida-normal, duración:1
+tiempo 12: entrada de pedido P06 de comida rapida-prioritario, duración:1
+tiempo 14: pedido P04 que entró en tiempo 8 RETRASADO
+tiempo 15: pedido P03 que entró en tiempo 6 ESCALADO a prioritario
+tiempo 16: pedido P03 que entró en tiempo 6 RETRASADO
+tiempo 18: pedido P06 que entró en tiempo 12 RETRASADO
+tiempo 19: pedido P05 que entró en tiempo 10 ESCALADO a prioritario
+tiempo 20: pedido P05 que entró en tiempo 10 RETRASADO
+tiempo 22: fin reparto pedido P01, iniciado en tiempo 2, duración: 20
+tiempo 22: inicio reparto P06 que entró en tiempo 12, duración 1
+tiempo 23: fin reparto pedido P06, iniciado en tiempo 22, duración: 1
+tiempo 23: inicio reparto P03 que entró en tiempo 6, duración 1
+tiempo 24: fin reparto pedido P02, iniciado en tiempo 4, duración: 20
+tiempo 24: fin reparto pedido P03, iniciado en tiempo 23, duración: 1
+tiempo 24: inicio reparto P05 que entró en tiempo 10, duración 1
+tiempo 24: inicio reparto P04 que entró en tiempo 8, duración 1
+tiempo 25: fin reparto pedido P05, iniciado en tiempo 24, duración: 1
+tiempo 25: fin reparto pedido P04, iniciado en tiempo 24, duración: 1
+
+Resumen final
+-------------
+Tiempo medio de espera por tipo de pedido:
+- rapida: 10.25
+- tradicional: 8.00
+Número de pedidos que han pasado a prioritarios de forma automática: 2
+Tiempo total medio desde el registro hasta la entrega: 16.83
