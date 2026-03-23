@@ -14,10 +14,10 @@ suma([Head|Tail],Result) :-
 % 2º Crear predicado intervalo(A,B,L) que toma como entrada dos números enteros A y B y tiene que generar en L la lista de números
 % comprendida entre A y B.
 %Casos base 
-intervalo(X,X,[X]).
+intervalo(X,X,[X]) :- !.
 
 intervalo(A,B,[]):-
-    A > B.
+    A > B, !.
 
 %Caso recursivo
 intervalo(A,B,[A|Tail]) :-
@@ -28,12 +28,11 @@ intervalo(A,B,[A|Tail]) :-
 % 3º Crear predicado inserta(X,L1,L2) que inserta un elemento X en una lista L1 que está previamente ordenada (con la relación de orden @<)
 % y devuelve la nueva lista L2 ordenada pero conteniendo también el nuevo elemento X.
 %Caso base
-inserta(X,[],[X]).
+inserta(D,[],[D]) :- !.
+inserta(D,[Head|Tail],[D, Head|Tail]) :-
+    D @=< Head, !.
 
 %Caso recursivo
-inserta(D,[Head|Tail],[D, Head|Tail]) :-
-    D @=< Head.
-
 inserta(D,[Head|Tail],[Head|Resto]):-
     D @> Head,
     inserta(D,Tail,Resto).
@@ -49,5 +48,9 @@ insercion([Head|Tail],Res):-
     insercion(Tail,Resto),
     inserta(Head,Resto,Res). 
 
+% insercion_acc(L, R) :-
+%     aux_insercion_acc(L, [], R).
+
+% aux_insercion_acc([], Acc, Acc) :- !.
 
 
