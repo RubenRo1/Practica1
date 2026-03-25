@@ -1,0 +1,6 @@
+P01 C01 rapida prioritario 20
+P02 C02 tradicional prioritario 20
+P03 C03 rapida normal 1
+P04 C04 tradicional prioritario 1
+P05 C05 rapida normal 1
+P06 C06 rapida prioritario 1

@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=windows-1252"
+      http-equiv="Content-Type">
+    <title>KR</title>
+  </head>
+  <body vlink="#551A8B" text="#000000" link="#0000EE" bgcolor="#ccccff"
+    alink="#EE0000">
+    <table width="70%" cellspacing="2" cellpadding="2" border="0"
+      align="center">
+      <tbody>
+        <tr>
+          <td valign="top" bgcolor="#ffffff" align="center">
+            <h2>Lógica: práctica 0</h2>
+            <h1>Ejercicios de listas</h1>
+            <br>
+            <font <br="">
+              <div align="left">En esta primera práctica entregaremos un
+                programa Prolog llamado <b>listas.pl</b> que deberá
+                implementar los siguientes predicados:<br>
+                <br>
+                <ol>
+                  <li>Programa el predicado <tt><b>suma</b></tt><font
+                      <br=""><tt><b>(L,N)</b></tt></font><font <br="">
+                      que toma cualquier lista de números enteros L y
+                      devuelve en N la suma total de todos los elementos
+                      de L. Ejemplos:<br>
+                      <br>
+                    </font><b><font <br=""><tt>?- suma([4,2,-7,11],N).</tt><tt><br>
+                        </tt><tt>N = 10.</tt><tt><br>
+                        </tt><tt><br>
+                        </tt><tt>?- suma([],N).</tt><tt><br>
+                        </tt><tt>N = 0.</tt><tt><br>
+                        </tt><tt><br>
+                        </tt><tt>?- suma([2,2,2,2,2],N).</tt><tt><br>
+                        </tt><tt>N = 10.</tt></font></b><font <br=""><br>
+                      <br>
+                    </font></li>
+                  <li>Programa el predicado <tt><b>intervalo(A,B,L)</b>
+                    </tt>que toma como entrada dos números enteros <font
+                      <br=""><tt><b>A</b></tt></font> y <font <br=""><tt><b>B</b></tt></font>
+                    y tiene que generar en <font <br=""><tt><b>L</b></tt></font>
+                    la lista de números comprendida entre <font <br=""><font
+                        <br=""><tt><b>A</b></tt></font> y <font <br=""><tt><b>B</b></tt></font></font>.
+                    Ejemplos:<br>
+                    <br>
+                    <font <br=""><font <br=""><tt><b>?-
+                            intervalo(2,7,L).</b><b><br>
+                          </b><b>L = [2, 3, 4, 5, 6, 7].</b><b><br>
+                          </b><b><br>
+                          </b><b>?- intervalo(-5,0,L).</b><b><br>
+                          </b><b>L = [-5, -4, -3, -2, -1, 0].</b><b><br>
+                          </b><b><br>
+                          </b><b>?- intervalo(8,2,L).</b><b><br>
+                          </b><b>L = [].</b><b><br>
+                            <br>
+                          </b></tt></font></font><font <br=""><font
+                        <br="">Nota: no es necesario comprobar que A y B
+                        sean números enteros. Se presupone que siempre
+                        lo serán.<br>
+                      </font></font><font <br=""><font <br=""><tt><b><br>
+                          </b></tt></font></font></li>
+                  <li>El predicado '&lt;' de Prolog sirve para comparar
+                    números, pero la versión '@&lt;'&nbsp; permite
+                    comparar cualquier par de términos de forma
+                    ordenada. Por ejemplo, <b><tt>a @&lt; b</tt></b>
+                    devuelve <b><tt>true</tt></b>. Programa el
+                    predicado <tt><b>inserta</b></tt><font <br=""><tt><b>(X,L1,L2)</b></tt></font>que
+
+
+                    inserta un elemento <font <br=""><tt><b>X </b></tt></font>en
+
+
+                    una lista <font <br=""><font <br=""><tt><b>L1 </b></tt></font></font>que
+
+
+                    está previamente ordenada (con la relación de orden
+                    @&lt;) y devuelve la nueva lista <font <br=""><font
+                        <br=""><font <br=""><tt><b>L2</b></tt></font></font></font>
+                    ordenada pero conteniendo también el nuevo elemento
+                    <font <br=""><font <br=""><tt><b>X</b></tt></font></font>.
+                    Ejemplos:<br>
+                    <br>
+                    <b><tt>?- inserta(d,[a,f,h],L).</tt></b><b><tt><br>
+                      </tt></b><b><tt>L = [a, d, f, h].</tt></b><b><tt><br>
+                      </tt></b><b><tt><br>
+                      </tt></b><b><tt>?- inserta(5,[3,6,8],L).</tt></b><b><tt><br>
+                      </tt></b><b><tt>L = [3, 5, 6, 8].<br>
+                        <br>
+                        ?- intervalo(3,5,L), inserta(23,L,L2).<br>
+                        L = [3, 4, 5],<br>
+                        L2 = [3, 4, 5, 23].<br>
+                        <br>
+                      </tt></b></li>
+                  <li>Define el predicado <b><tt>insercion(L1,L2)</tt></b>
+                    que ordena (usando la relación @&lt;) cualquier
+                    lista <font <br=""><font <br=""><font <br=""><tt><b>L1</b></tt></font></font></font>
+                    para devolver la lista ordenada <font <br=""><font
+                        <br=""><font <br=""><tt><b>L2</b></tt></font></font></font>
+                    con los mismos elementos que <font <br=""><font
+                        <br=""><font <br=""><tt><b>L1</b></tt></font></font></font>,
+                    utilizando el método de <i>ordenación por inserción</i>.
+                    Ese método va tomando elemento a elemento de la
+                    lista original y los va insertando en una lista
+                    nueva que permanece siempre ordenada. Usa el
+                    predicado <tt><b>inserta</b></tt><font <br=""><b><tt>(X,L1,L2)</tt></b></font>
+                    para cada paso de inserción de este método de
+                    ordenación. Ejemplos:<br>
+                    <br>
+                    <b><tt>?- insercion([b,a,g,e],L).</tt></b><b><tt><br>
+                      </tt></b><b><tt>L = [a, b, e, g].</tt></b><b><tt><br>
+                      </tt></b><b><tt><br>
+                      </tt></b><b><tt>?- insercion([2,6,-2,6,11,21],L).</tt></b><b><tt><br>
+                      </tt></b><b><tt>L = [-2, 2, 6, 6, 11, 21].<br>
+                        <br>
+                      </tt></b>Opcional: apóyate en una versión del
+                    predicado que realiza la inserción de forma
+                    acumulada. Por ejemplo, usa <font <br=""><b><tt>acumula(L1,L2,L3)
+
+                        </tt></b></font>para ir tomando elementos de <font
+                      <br=""><font <br=""><b><tt>L1</tt></b></font></font>
+                    uno a uno, e insertándolos en <font <br=""><font
+                        <br=""><b><tt>L2</tt></b></font></font>
+                    (ordenada) para generar <font <br=""><font <br=""><b><tt>L3</tt></b></font></font>.
+                    La llamada inicial a ese predicado sería <b><tt>acumula(L1,[],L2)</tt></b><b><tt>.</tt></b><b><tt><br>
+                      </tt></b></li>
+                </ol>
+                <h3>Entrega y evaluación<br>
+                </h3>
+              </div>
+              <p align="left">Esta práctica no puntúa, pero su entrega
+                se tendrá en cuenta a la hora de valorar la evaluación
+                continua de cara a la defensa de las demás prácticas. La
+                entrega se realizará a través del campus virtual. La
+                práctica se realizará <b>preferentemente en grupos de 2
+                  alumnos</b>. La entrega se realizará en una tarea del
+                Campus Virtual (moodle): es suficiente con realizar la
+                entrega en una de las dos cuentas de alumnos, pero el
+                código debe incluir en las primeras líneas en
+                comentarios los nombres de los dos componentes del
+                grupo. Fecha de entrega: <b><font color="#ff0000">26 de
+                    marzo de 2026 (23:59)</font>.</b><br>
+              </p>
+            </font></td>
+          <td valign="top"><br>
+          </td>
+        </tr>
+        <tr align="right">
+          <td valign="top" bgcolor="#ccccff"><i>Maintained by Pedro
+              Cabalar. <br>
+            </i></td>
+          <td valign="top"><br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div align="right"><br>
+    </div>
+  </body>
+</html>
