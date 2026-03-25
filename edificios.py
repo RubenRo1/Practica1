@@ -1,4 +1,9 @@
 from abc import ABC, abstractmethod
+"""
+Autores:
+    Iago Núñez Lourés - iago.nunez.loures@udc.es
+    Rubén Rodríguez Catrufo - ruben.rodriguez.catrufo@udc.es
+"""
 
 class Edificio(ABC):   
     """Clase abstracta que define los distintos tipos de edificio.

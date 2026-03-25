@@ -1,4 +1,9 @@
 from edificios import Edificio
+"""
+Autores:
+    Iago Núñez Lourés - iago.nunez.loures@udc.es
+    Rubén Rodríguez Catrufo - ruben.rodriguez.catrufo@udc.es
+"""
 
 class Oficinas(Edificio):
     """Representa un edificio de tipo oficina.

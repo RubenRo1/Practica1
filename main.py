@@ -1,5 +1,9 @@
 """
 Simulación de la evolución de SimCiudad mediante eventos aleatorios
+
+Autores:
+    Iago Núñez Lourés - iago.nunez.loures@udc.es
+    Rubén Rodríguez Catrufo - ruben.rodriguez.catrufo@udc.es
 """
 import sys
 import json
@@ -313,7 +317,7 @@ def simulacion(ciudad: Ciudad, pools:dict, num_meses: int):
         print(f'Edificios construidos: {tipos_de_edificio[edificio]}')
 
         #Descomentar el input si queremos realizar la simulacion mes a mes
-        input()
+        #input()
 
         #Vamos acumulando los datos con los que haremos el analisis estadistico despues
         data.append([ciudad.habitantes, ciudad.felicidad, ciudad.presupuesto, inmigrantes, emigrantes, 

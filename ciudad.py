@@ -3,6 +3,12 @@ from viviendas import Viviendas
 from oficinas import Oficinas
 from equipamiento import Equipamiento
 
+"""
+Autores:
+    Iago Núñez Lourés - iago.nunez.loures@udc.es
+    Rubén Rodríguez Catrufo - ruben.rodriguez.catrufo@udc.es
+"""
+
 class Ciudad:
     """Representa una ciudad que contiene edificios, habitantes y presupuesto.
 
