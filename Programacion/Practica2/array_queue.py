@@ -29,7 +29,7 @@ class Empty(Exception):
 class ArrayQueue:
     """FIFO queue implementation using a Python list as underlying storage."""
 
-    DEFAULT_CAPACITY = 10  # moderate capacity for all new queues
+    DEFAULT_CAPACITY = 20  # moderate capacity for all new queues
 
     def __init__(self):
         """Create an empty queue."""
