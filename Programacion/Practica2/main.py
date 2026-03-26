@@ -17,7 +17,12 @@ def main():
         print("Fichero no encontrado")
 
     #Simulacion por 50 tiempos (para comprobar que se procesan los pedidos, se escalan y se retrasan)
-    for _ in range(50):
+    while (not gestor._cola_registro.is_empty() or 
+           not gestor._rapida_prioritaria.is_empty() or
+           not gestor._tradicional_prioritaria.is_empty() or
+           not gestor._rapida_normal.is_empty() or
+           not gestor._tradicional_normal.is_empty() or
+           len(gestor._pedidos_en_reparto) > 0):
         gestor.avanzar_tiempo()
 
 
