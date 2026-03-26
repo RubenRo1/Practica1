@@ -16,6 +16,7 @@ class gestor_pedidos:
         self._pedidos = LinkedQueue()
         self._contador = 0
         self._repartidores = repartidores
+        self._pedidos_en_reparto = []
         self._t_actual = 0
 
         self._rapida_prioritaria = LinkedQueue()
@@ -57,20 +58,71 @@ class gestor_pedidos:
         normales = [(self._rapida_normal, self._rapida_prioritaria),(self._tradicional_normal, self._tradicional_prioritaria)]
         for colas_normal, colas_prio in normales:
             if not colas_normal.is_empty():
-                pedido = colas_normal.first()
-                if (self._t_actual - pedido.t_entrada) > 8:
-                    pedido = colas_normal.dequeue()
-                    pedido.prioridad = 'prioritario'
-                    colas_prio.enqueue(pedido)
-                    print(f"tiempo {self._t_actual}: pedido {pedido.id_pedido} que entró en tiempo {pedido.t_entrada} ESCALADO a prioritario")
+                p = colas_normal.first()
+                if (self._t_actual - p.t_entrada) > 8:
+                    p = colas_normal.dequeue()
+                    p.prioridad = 'prioritario'
+                    colas_prio.enqueue(p)
+                    print(f"tiempo {self._t_actual}: pedido {p.id_pedido} que entró en tiempo {p.t_entrada} ESCALADO a prioritario")
 
         # 2º Comprobar retraso y mostrar mensaje de retraso
         prioritarios = [self._rapida_prioritaria, self._tradicional_prioritaria]
         for colas_prio in prioritarios:
             if not colas_prio.is_empty():
-                pedido = colas_prio.first()
-                if (self._t_actual - pedido.t_entrada) > 5:
-                    print(f"tiempo {self._t_actual}: pedido {pedido.id_pedido} que entró en tiempo {pedido.t_entrada} RETRASADO")
+                p = colas_prio.first()
+                
+                if (self._t_actual - p.t_entrada) > 5:
+
+
+
+
+                    # ------------------------------------------------IA-----------------------------------------------------------
+                    if not hasattr(p, '_avisado_retraso'): # Comprueba si existe el flag
+                        print(f"tiempo {self._t_actual}: pedido {p.id_pedido} que entró en tiempo {p.t_entrada} RETRASADO")
+                        p._avisado_retraso = True
+                    # ------------------------------------------------IA-----------------------------------------------------------
+
+
+
+
+                    
+
+    def obtener_siguiente_pedido(self):
+
+        if not self._rapida_prioritaria.is_empty():
+            return self._rapida_prioritaria.dequeue()
+        
+        elif not self._tradicional_prioritaria.is_empty():
+            return self._tradicional_prioritaria.dequeue()
+        
+        elif not self._rapida_normal.is_empty():
+            return self._rapida_normal.dequeue()
+        
+        elif not self._tradicional_normal.is_empty():
+            return self._tradicional_normal.dequeue()
+
+        return None
+    
+    def gestionar_reparto(self):
+        
+        for p in self._pedidos_en_reparto[:]:
+            if self._t_actual == (p.t_inicio_reparto + p.duracion_entrega):
+                self._pedidos_en_reparto.remove(p)
+                self._repartidores += 1
+                print(f"tiempo {self._t_actual}: fin reparto pedido {p.id_pedido}, iniciado en tiempo {p.t_inicio_reparto}, duración: {p.duracion_entrega}")
+        
+        while self._repartidores > 0:
+            siguiente = self.obtener_siguiente_pedido()
+
+            if siguiente is not None:
+
+                siguiente.t_inicio_reparto = self._t_actual
+                self._pedidos_en_reparto.append(siguiente)
+                self._repartidores -= 1
+                print(f"tiempo {self._t_actual}: inicio reparto pedido {siguiente.id_pedido} que entró en tiempo {siguiente.t_entrada}, duración {siguiente.duracion_entrega}")
+            
+            else:
+                break
 
     def avanzar_tiempo(self):
         #Avanza el tiempo
@@ -82,11 +134,11 @@ class gestor_pedidos:
             p.t_entrada = self._t_actual
             self._clasificar_pedido(p)
 
-            print(f"tiempo {self._t_actual}: entrada de pedido {p.id_pedido} "
-                  f"de comida {p.tipo}-{p.prioridad}, duración:{p.duracion_entrega}")
+            print(f"tiempo {self._t_actual}: entrada de pedido {p.id_pedido} de comida {p.tipo}-{p.prioridad}, duración:{p.duracion_entrega}")
 
         #Cada vez que avanza el tiempo comprobamos prioridades y retrasos
         self.prioridades_y_retrasos()
+        self.gestionar_reparto()
 
 
     '''
