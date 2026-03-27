@@ -6,6 +6,7 @@ class Pedido:
         self._id_cliente = id_cliente
         self._tipo = tipo
         self._prioridad = prioridad
+        self._cambio_prioridad = False
         
         self._duracion_entrega = duracion_entrega 
 
@@ -13,6 +14,12 @@ class Pedido:
         self._t_inicio_reparto = None
         self._t_fin = None #Tiempo de inicio del reparto + duracion_entrega, para considerar q el pedido fue enviado
 
+    def cambiar_prioridad(self):
+        self._cambio_prioridad = True
+
+    @property
+    def cambio_prioridad(self):
+        return self._cambio_prioridad
 
     @property
     def id_pedido(self):

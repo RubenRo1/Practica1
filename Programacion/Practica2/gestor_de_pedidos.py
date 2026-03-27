@@ -100,10 +100,11 @@ class gestor_pedidos:
 
         escalados = []
         #Comprobamos primero si estan vacias y luego si el primero va con retraso
-        if (not self._tradicional_normal.is_empty() 
+        if (not self._rapida_normal.is_empty() 
             and self._t_actual - self._rapida_normal.first().t_entrada > 8):
             pedido = self._rapida_normal.dequeue()
             pedido.prioridad = 'prioritario'
+            pedido.cambiar_prioridad()
             self._rapida_prioritaria.enqueue(pedido)
             escalados.append(pedido)
         
@@ -111,6 +112,7 @@ class gestor_pedidos:
             and self._t_actual - self._tradicional_normal.first().t_entrada > 8):
             pedido = self._tradicional_normal.dequeue()
             pedido.prioridad = 'prioritario'
+            pedido.cambiar_prioridad()
             self._tradicional_prioritaria.enqueue(pedido)
             escalados.append(pedido)
         
