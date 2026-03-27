@@ -67,5 +67,5 @@ class Pedido:
     def t_fin(self):
         return self._t_fin
     @t_fin.setter
-    def t_inicio_reparto(self, t_fin):
+    def t_fin(self, t_fin):
         self._t_fin = t_fin
