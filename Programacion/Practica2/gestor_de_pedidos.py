@@ -6,17 +6,16 @@ Autores:
 
 from linked_queue import LinkedQueue
 from pedido import Pedido
+from exceptions import tipo_invalido, prioridad_invalida
 
 class gestor_pedidos:
 
-    def __init__(self, repartidores=2):
+    def __init__(self, cola_registro = None, repartidores=2):
 
-        self._cola_registro = LinkedQueue()
+        self._cola_registro = cola_registro if cola_registro != None else LinkedQueue()
 
-        self._pedidos = LinkedQueue()
-        self._contador = 0
-        self._repartidores = repartidores
-        self._pedidos_en_reparto = []
+        self._repartidores_max = repartidores
+        self._repartidores_libres = repartidores
         self._t_actual = 0
 
         self._rapida_prioritaria = LinkedQueue()
@@ -25,11 +24,120 @@ class gestor_pedidos:
         self._tradicional_normal = LinkedQueue()
 
         #Los vamos acumulando para poder sacar estadisticas
+        self._pedidos_en_reparto = []
         self._pedidos_finalizados = []
 
-    def registrar_pedido(self, pedido:Pedido):
-        #Inserta el pedido en la cola de registro
+    def avanzar_tiempo(self):
+        """Ejecuta un ciclo completo de simulación."""
+        
+        eventos = {}
+        eventos['pedido_registrado'] = None
+        self._t_actual += 1
+        #Registramos un nuevo pedido cada 2 ciclos, empezando en el ciclo 1
+        if self._t_actual % 2 != 0:
+            eventos['pedido_registrado'] = self._registrar_pedido()
+
+        eventos['retraso'] = self._avisar_retrasos_prioritarios()
+        eventos['escalado'] = self._escalar_normales()
+        
+        eventos['pedidos_entregados'] = self._liberar_repartidores()
+        eventos['pedidos_entraron_reparto'] = self._asignar_repartos()
+
+        return eventos
+
+    def hay_pedidos_pendientes(self):
+        """Devuelve True si aún quedan pedidos por gestionar o repartir."""
+        return (
+            not self._cola_registro.is_empty()
+            or not self._cola_rapida_prioritaria.is_empty()
+            or not self._cola_rapida_normal.is_empty()
+            or not self._cola_tradicional_prioritaria.is_empty()
+            or not self._cola_tradicional_normal.is_empty()
+            or len(self._pedidos_en_reparto) > 0
+            )
+
+    def resumen_estado(self):
+        """Devuelve un resumen del estado actual del sistema."""
+        pass
+
+    def anadir_pedido(self, pedido):
+        """No es necesario en el ejercicio, peron en una situacion real, entrarian nuevos pedidos a la cola de registro"""
         self._cola_registro.enqueue(pedido)
+
+    def _registrar_pedido(self):
+        """Cada 2 unidades, pasa un pedido de la cola de registro a su cola correspondiente."""
+
+        pedido = self._cola_registro.dequeue()
+        self._clasificar_pedido(pedido)
+        return pedido
+
+    def _avisar_retrasos_prioritarios(self):
+        """Comprueba si hay prioritarios esperando más de 5 unidades."""
+
+        return (self._tradicional_prioritaria.first().t_entrada - self._t_actual < 0
+                or self._rapida_prioritaria.first().t_entrada - self._t_actual < 0)
+
+    def _escalar_normales(self):
+        """Convierte en prioritarios los pedidos normales que superen 8 unidades de espera."""
+
+        if self._rapida_normal.first().t_entrada - self._t_actual > 8:
+            self._rapida_prioritaria.enqueue(self._rapida_normal.first())
+            return self._rapida_normal.dequeue()
+        
+        if self._tradicional_normal.first().t_entrada - self._t_actual > 8:
+            self._tradicional_prioritaria.enqueue(self._tradicional_normal.first())
+            return self._tradicional_normal.dequeue()
+        
+        return None
+
+    def _liberar_repartidores(self):
+        """Comprueba qué pedidos ya han terminado su reparto."""
+
+        pedidos_entregados = []
+        for pedido in self._pedidos_en_reparto:
+            if pedido.t_inicio_reparto - self._t_actual == pedido.duracion_entrega:
+                pedido.t_fin = self._t_actual
+                self._pedidos_finalizados.append(pedido)
+                self._pedidos_en_reparto.remove(pedido)
+
+                pedidos_entregados.append(pedido)
+                self._repartidores_libres += 1
+
+        return pedidos_entregados
+            
+    def _asignar_repartos(self):
+        """Asigna pedidos a repartidores libres respetando prioridad y orden."""
+        #Lista con los pedidos que han entrado en reparto
+        pedidos = []
+        while self._repartidores_libres > 0:
+            pedido = self._siguiente_pedido()
+            #Puede ser que haya repartidores pero no pedidos a repartir
+            if pedido == None:
+                break
+            
+            pedido.t_inicio_reparto = self._t_actual
+            self._pedidos_en_reparto.append(pedido)
+            self._repartidores_libres -= 1
+            pedidos.append(pedido)
+
+        return pedidos
+        
+    def _siguiente_pedido(self):
+        """Obtiene el siguiente pedido a repartir según las reglas de prioridad."""
+
+        #Realizamos los checks siguiendo la prioridad, 
+        # y en caso de que no haya pedidos pendientes, devolvemos None
+
+        if not self._rapida_prioritaria.is_empty():
+            return self._rapida_prioritaria.dequeue()
+        if not self._tradicional_prioritaria.is_empty():
+            return self._tradicional_prioritaria.dequeue()
+        if not self._rapida_normal.is_empty():
+            return self._rapida_normal.dequeue()
+        if not self._tradicional_normal.is_empty():
+            return self._tradicional_normal.dequeue()
+        
+        return None
 
 
     def _clasificar_pedido(self, pedido:Pedido):
@@ -43,102 +151,9 @@ class gestor_pedidos:
             case 'tradicional', 'normal':
                 self._tradicional_normal.enqueue(pedido)
             case _:
-                #crear excepcion si no existe ese tipo
-                pass
-        
-
-    def anadir_pedido(self, pedido:Pedido):
-        #Primero clasificamos en caso de que el pedido sea invalido
-        self._clasificar_pedido(pedido)
-        #Anadir tiempos de entrada, hay que tocar Pedido
-        self._pedidos.enqueue(pedido)
-
-    def prioridades_y_retrasos(self):         
-        # 1º Comprobar si el pedido normla supera las 8 unidades de tiempo para pasarlo a prioritario
-        normales = [(self._rapida_normal, self._rapida_prioritaria),(self._tradicional_normal, self._tradicional_prioritaria)]
-        for colas_normal, colas_prio in normales:
-            if not colas_normal.is_empty():
-                p = colas_normal.first()
-                if (self._t_actual - p.t_entrada) > 8:
-                    p = colas_normal.dequeue()
-                    p.prioridad = 'prioritario'
-                    colas_prio.enqueue(p)
-                    print(f"tiempo {self._t_actual}: pedido {p.id_pedido} que entró en tiempo {p.t_entrada} ESCALADO a prioritario")
-
-        # 2º Comprobar retraso y mostrar mensaje de retraso
-        prioritarios = [self._rapida_prioritaria, self._tradicional_prioritaria]
-        for colas_prio in prioritarios:
-            if not colas_prio.is_empty():
-                p = colas_prio.first()
-                
-                if (self._t_actual - p.t_entrada) > 5:
-
-
-
-
-                    # ------------------------------------------------IA-----------------------------------------------------------
-                    if not hasattr(p, '_avisado_retraso'): # Comprueba si existe el flag
-                        print(f"tiempo {self._t_actual}: pedido {p.id_pedido} que entró en tiempo {p.t_entrada} RETRASADO")
-                        p._avisado_retraso = True
-                    # ------------------------------------------------IA-----------------------------------------------------------
-
-
-
-
-                    
-
-    def obtener_siguiente_pedido(self):
-
-        if not self._rapida_prioritaria.is_empty():
-            return self._rapida_prioritaria.dequeue()
-        
-        elif not self._tradicional_prioritaria.is_empty():
-            return self._tradicional_prioritaria.dequeue()
-        
-        elif not self._rapida_normal.is_empty():
-            return self._rapida_normal.dequeue()
-        
-        elif not self._tradicional_normal.is_empty():
-            return self._tradicional_normal.dequeue()
-
-        return None
-    
-    def gestionar_reparto(self):
-        
-        for p in self._pedidos_en_reparto[:]:
-            if self._t_actual == (p.t_inicio_reparto + p.duracion_entrega):
-                self._pedidos_en_reparto.remove(p)
-                self._repartidores += 1
-                print(f"tiempo {self._t_actual}: fin reparto pedido {p.id_pedido}, iniciado en tiempo {p.t_inicio_reparto}, duración: {p.duracion_entrega}")
-        
-        while self._repartidores > 0:
-            siguiente = self.obtener_siguiente_pedido()
-
-            if siguiente is not None:
-
-                siguiente.t_inicio_reparto = self._t_actual
-                self._pedidos_en_reparto.append(siguiente)
-                self._repartidores -= 1
-                print(f"tiempo {self._t_actual}: inicio reparto pedido {siguiente.id_pedido} que entró en tiempo {siguiente.t_entrada}, duración {siguiente.duracion_entrega}")
-            
-            else:
-                break
-
-    def avanzar_tiempo(self):
-        #Avanza el tiempo
-        self._t_actual += 1
-
-        if self._t_actual % 2 == 0 and not self._cola_registro.is_empty():
-            #Cada 2 de unidades de tiempo extraemos el pedido y lo clasificamos, guardando el tiempo de entrada
-            p = self._cola_registro.dequeue()
-            p.t_entrada = self._t_actual
-            self._clasificar_pedido(p)
-
-            print(f"tiempo {self._t_actual}: entrada de pedido {p.id_pedido} de comida {p.tipo}-{p.prioridad}, duración:{p.duracion_entrega}")
-
-        #Cada vez que avanza el tiempo comprobamos prioridades y retrasos
-        self.prioridades_y_retrasos()
-        self.gestionar_reparto()
+                if pedido.tipo not in ['rapida', 'tradicional']:
+                    raise tipo_invalido
+                raise prioridad_invalida
 
 
     '''
