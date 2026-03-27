@@ -35,8 +35,9 @@ class gestor_pedidos:
         """Ejecuta un ciclo completo de simulación."""
 
         eventos = {}
-        eventos['pedido_registrado'] = None
         self._t_actual += 1
+        eventos['tiempo_actual'] = self._t_actual
+        eventos['pedido_registrado'] = None
         #Registramos un nuevo pedido cada 2 ciclos, empezando en el ciclo 1
         if self._t_actual % 2 != 0:
             eventos['pedido_registrado'] = self._registrar_pedido()
@@ -56,7 +57,7 @@ class gestor_pedidos:
             or not self._rapida_prioritaria.is_empty()
             or not self._rapida_normal.is_empty()
             or not self._tradicional_prioritaria.is_empty()
-            or not self._radicional_normal.is_empty()
+            or not self._tradicional_normal.is_empty()
             or len(self._pedidos_en_reparto) > 0
             )
 
