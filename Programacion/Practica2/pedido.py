@@ -48,3 +48,24 @@ class Pedido:
     @duracion_entrega.setter
     def duracion_entrega(self,duracion_entrega):
         self._duracion_entrega = duracion_entrega
+
+    @property
+    def t_entrada(self):
+        return self._t_entrada
+    @t_entrada.setter
+    def t_entrada(self, t_entrada):
+        self._t_entrada = t_entrada
+
+    @property
+    def t_inicio_reparto(self):
+        return self._t_inicio_reparto
+    @t_inicio_reparto.setter
+    def t_inicio_reparto(self, t_inicio_reparto):
+        self._t_inicio_reparto = t_inicio_reparto
+
+    @property
+    def t_fin(self):
+        return self._t_fin
+    @t_fin.setter
+    def t_inicio_reparto(self, t_fin):
+        self._t_fin = t_fin
