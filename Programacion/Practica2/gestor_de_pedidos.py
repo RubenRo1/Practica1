@@ -4,19 +4,86 @@ Autores:
     Rubén Rodríguez Catrufo
 """
 
+"""
+ANADIR GETTERS DE LOS DATOS NECESARIOS
+"""
+
 from linked_queue import LinkedQueue
 from pedido import Pedido
+from exceptions import tipo_invalido, prioridad_invalida
 
 class gestor_pedidos:
+    """Administra las cuatro colas de pedidos y asigna los pedidos al reparto .
 
-    def __init__(self, repartidores=2):
+    Esta clase controla el ciclo de vida de los pedidos desde su registro, 
+    clasificación por tipo y prioridad, gestión de esperas (escalado y avisos) 
+    hasta la asignación de repartidores libres.
 
-        self._cola_registro = LinkedQueue()
+    Attributes
+    ----------
+    _cola_registro : LinkedQueue
+        Cola de espera donde aguardan los pedidos antes de ser procesados.
+    _repartidores_max : int
+        Número total de repartidores contratados en el sistema.
+    _repartidores_libres : int
+        Número de repartidores que no están realizando una entrega actualmente.
+    _t_actual : int
+        Contador de unidades de tiempo transcurridas en la simulación.
+    _rapida_prioritaria : LinkedQueue
+        Cola de pedidos rápidos con alta prioridad.
+    _rapida_normal : LinkedQueue
+        Cola de pedidos rápidos con prioridad normal.
+    _tradicional_prioritaria : LinkedQueue
+        Cola de pedidos tradicionales con alta prioridad.
+    _tradicional_normal : LinkedQueue
+        Cola de pedidos tradicionales con prioridad normal.
+    _pedidos_en_reparto : list
+        Lista de objetos Pedido que están actualmente en tránsito.
+    _pedidos_finalizados : list
+        Historial de todos los pedidos cuya entrega se ha completado.
 
-        self._pedidos = LinkedQueue()
-        self._contador = 0
-        self._repartidores = repartidores
-        self._pedidos_en_reparto = []
+    Methods
+    -------
+    avanzar_tiempo():
+        Ejecuta un ciclo completo de simulación y devuelve los eventos ocurridos
+    hay_pedidos_pendientes():
+        Indica si quedan pedidos por gestionar o repartir.
+    anadir_pedido(pedido):
+        Añade un pedido en la cola de registro
+    _registrar_pedido():
+        Cada 2 unidades, pasa un pedido de la cola de registro a su cola correspondiente.
+    _avisar_retrasos_prioritarios():
+        Identifica pedidos prioritarios que superan el tiempo de espera.
+    _escalar_normales():
+        Cambia pedidos de prioridad normal a prioritaria por tiempo.
+    _liberar_repartidores():
+        Finaliza las entregas y libera a los repartidores correspondientes.
+    _asignar_repartos():
+        Asocia pedidos pendientes a los repartidores que están libres.
+    _siguiente_pedido():
+        Selecciona el próximo pedido a repartir según la jerarquía de colas.
+    _clasificar_pedido(pedido):
+        Ubica un pedido en su cola específica según tipo y prioridad.
+    
+    """
+    def __init__(self, cola_registro = None, repartidores=2):
+        """Inicializa el gestor con colas vacias y los repartidores ya definidos.
+
+        Parameters
+        ----------
+        cola_registro : LinkedQueue
+            Cola inicial de pedidos. Si es None, se crea una vacia.
+        repartidores : int
+            Numero de repartidores (por defecto 2).
+
+        Returns
+        -------
+        None.
+        """
+        self._cola_registro = cola_registro if cola_registro != None else LinkedQueue()
+
+        self._repartidores_max = repartidores
+        self._repartidores_libres = repartidores
         self._t_actual = 0
 
         self._rapida_prioritaria = LinkedQueue()
@@ -25,14 +92,218 @@ class gestor_pedidos:
         self._tradicional_normal = LinkedQueue()
 
         #Los vamos acumulando para poder sacar estadisticas
+        self._pedidos_en_reparto = []
         self._pedidos_finalizados = []
 
-    def registrar_pedido(self, pedido:Pedido):
-        #Inserta el pedido en la cola de registro
+    def avanzar_tiempo(self):
+        """Ejecuta un ciclo completo de simulación actualizando todos los estados.
+        
+        Incrementa el tiempo, registra pedidos, comprueba retrasos, escala prioridades
+        y gestiona la logica de reparto.
+        
+        Returns
+        -------
+        dict
+            Diccionario con los eventos sucedidos en este ciclo (registros, 
+            retrasos, escalados, entregas y nuevos repartos).
+        """
+
+        eventos = {}
+        self._t_actual += 1
+        eventos['tiempo_actual'] = self._t_actual
+        eventos['pedido_registrado'] = None
+        #Registramos un nuevo pedido cada 2 ciclos, empezando en el ciclo 1
+        if self._t_actual % 2 != 0:
+            eventos['pedido_registrado'] = self._registrar_pedido()
+
+        eventos['retrasados'] = self._avisar_retrasos_prioritarios()
+        eventos['escalados'] = self._escalar_normales()
+        
+        eventos['pedidos_entregados'] = self._liberar_repartidores()
+        eventos['pedidos_entraron_reparto'] = self._asignar_repartos()
+
+        return eventos
+
+    def hay_pedidos_pendientes(self):
+        """Comprueba si el sistema tiene trabajo pendiente en alguna de sus áreas.
+
+        Returns
+        -------
+        bool
+            True si hay pedidos en registro, colas de trabajo o en reparto.
+        """
+        return (
+            not self._cola_registro.is_empty()
+            or not self._rapida_prioritaria.is_empty()
+            or not self._rapida_normal.is_empty()
+            or not self._tradicional_prioritaria.is_empty()
+            or not self._tradicional_normal.is_empty()
+            or len(self._pedidos_en_reparto) > 0
+            )
+
+    def anadir_pedido(self, pedido):
+        """Añade un nuevo pedido a la cola de registro
+        
+        Parameters
+        ----------
+        pedido : Pedido
+            El objeto pedido que entra al sistema.
+
+        Returns
+        -------
+        None.
+        """
         self._cola_registro.enqueue(pedido)
 
+    def _registrar_pedido(self):
+        """Procesa un pedido de la cola de registro y lo clasifica
+        
+        Returns
+        -------
+        Pedido or None
+            El pedido procesado, None si la cola estaba vacía.
+        """
+
+        #Comprobamos si queda algo en la cola de registro
+        if self._cola_registro.is_empty():
+            return None
+
+        pedido = self._cola_registro.dequeue()
+        pedido.t_entrada = self._t_actual
+        self._clasificar_pedido(pedido)
+        return pedido
+
+    def _avisar_retrasos_prioritarios(self):
+        """Identidica los pedidos prioritarios que llevan más de 5 unidades esperando.
+
+        Returns
+        -------
+        list
+            Lista de objetos Pedido en el frente de las colas prioritarias 
+            que presentan retraso.
+        """
+        retrasados = []
+        #Comprobamos que las colas no esten vacias antes de acceder a ellas
+        if (not self._rapida_prioritaria.is_empty() and
+            self._t_actual - self._rapida_prioritaria.first().t_entrada > 5):
+            retrasados.append(self._rapida_prioritaria.first())
+
+        if (not self._tradicional_prioritaria.is_empty() and
+            self._t_actual - self._tradicional_prioritaria.first().t_entrada > 5):
+            retrasados.append(self._tradicional_prioritaria.first())
+
+        return retrasados
+
+    def _escalar_normales(self):
+        """Convierte pedidos normales a prioritarios tras 8 unidades de espera.
+
+        Returns
+        -------
+        list
+            Lista de pedidos que han sido escalados en este ciclo.
+        """
+
+        escalados = []
+        #Comprobamos primero si estan vacias y luego si el primero va con retraso
+        if (not self._tradicional_normal.is_empty() 
+            and self._t_actual - self._rapida_normal.first().t_entrada > 8):
+            pedido = self._rapida_normal.dequeue()
+            pedido.prioridad = 'prioritario'
+            self._rapida_prioritaria.enqueue(pedido)
+            escalados.append(pedido)
+        
+        if (not self._tradicional_normal.is_empty() 
+            and self._t_actual - self._tradicional_normal.first().t_entrada > 8):
+            pedido = self._tradicional_normal.dequeue()
+            pedido.prioridad = 'prioritario'
+            self._tradicional_prioritaria.enqueue(pedido)
+            escalados.append(pedido)
+        
+        return escalados
+
+    def _liberar_repartidores(self):
+        """Comprueba qué pedidos ya han terminado su reparto.
+        
+        Returns
+        -------
+        list
+            Pedidos cuya entrega se ha completado en este instante.
+        """
+
+        pedidos_entregados = []
+        #Recorremos una copia de la lista para no editarla y recorrela a la vez
+        for pedido in self._pedidos_en_reparto[:]:
+            if  self._t_actual - pedido.t_inicio_reparto == pedido.duracion_entrega:
+                pedido.t_fin = self._t_actual
+                self._pedidos_finalizados.append(pedido)
+                self._pedidos_en_reparto.remove(pedido)
+
+                pedidos_entregados.append(pedido)
+                self._repartidores_libres += 1
+
+        return pedidos_entregados
+            
+    def _asignar_repartos(self):
+        """Asigna pedidos a repartidores libres respetando prioridad y orden.
+        
+        Returns
+        -------
+        list
+            Pedidos que han iniciado su reparto en este ciclo.
+        """
+        
+        #Lista con los pedidos que han entrado en reparto
+        pedidos = []
+        while self._repartidores_libres > 0:
+            pedido = self._siguiente_pedido()
+            #Puede ser que haya repartidores pero no pedidos a repartir
+            if pedido == None:
+                break
+            
+            pedido.t_inicio_reparto = self._t_actual
+            self._pedidos_en_reparto.append(pedido)
+            self._repartidores_libres -= 1
+            pedidos.append(pedido)
+
+        return pedidos
+        
+    def _siguiente_pedido(self):
+        """Selecciona el pedido con mayor prioridad según el orden jerárquico.
+
+        Jerarquía: Rápida Prio > Tradicional Prio > Rápida Normal > Tradicional Normal.
+
+        Returns
+        -------
+        Pedido or None
+            El siguiente pedido en la jerarquía, None si no hay pendientes.
+        """
+
+        #Realizamos los checks siguiendo la prioridad, 
+        # y en caso de que no haya pedidos pendientes, devolvemos None
+
+        if not self._rapida_prioritaria.is_empty():
+            return self._rapida_prioritaria.dequeue()
+        if not self._tradicional_prioritaria.is_empty():
+            return self._tradicional_prioritaria.dequeue()
+        if not self._rapida_normal.is_empty():
+            return self._rapida_normal.dequeue()
+        if not self._tradicional_normal.is_empty():
+            return self._tradicional_normal.dequeue()
+        
+        return None
 
     def _clasificar_pedido(self, pedido:Pedido):
+        """Añade un pedido en su cola específica según tipo y prioridad.
+
+        Parameters
+        ----------
+        pedido : Pedido
+            El objeto pedido a clasificar.
+
+        Returns
+        -------
+        None.
+        """
         match pedido.tipo, pedido.prioridad:
             case 'rapida', 'prioritario':
                 self._rapida_prioritaria.enqueue(pedido)
@@ -43,118 +314,10 @@ class gestor_pedidos:
             case 'tradicional', 'normal':
                 self._tradicional_normal.enqueue(pedido)
             case _:
-                #crear excepcion si no existe ese tipo
-                pass
-        
+                if pedido.tipo not in ['rapida', 'tradicional']:
+                    raise tipo_invalido
+                raise prioridad_invalida
 
-    def anadir_pedido(self, pedido:Pedido):
-        #Primero clasificamos en caso de que el pedido sea invalido
-        self._clasificar_pedido(pedido)
-        #Anadir tiempos de entrada, hay que tocar Pedido
-        self._pedidos.enqueue(pedido)
-
-    def prioridades_y_retrasos(self):         
-        # 1º Comprobar si el pedido normla supera las 8 unidades de tiempo para pasarlo a prioritario
-        normales = [(self._rapida_normal, self._rapida_prioritaria),(self._tradicional_normal, self._tradicional_prioritaria)]
-        for colas_normal, colas_prio in normales:
-            if not colas_normal.is_empty():
-                p = colas_normal.first()
-                if (self._t_actual - p.t_entrada) > 8:
-                    p = colas_normal.dequeue()
-                    p.prioridad = 'prioritario'
-                    colas_prio.enqueue(p)
-                    print(f"tiempo {self._t_actual}: pedido {p.id_pedido} que entró en tiempo {p.t_entrada} ESCALADO a prioritario")
-
-        # 2º Comprobar retraso y mostrar mensaje de retraso
-        prioritarios = [self._rapida_prioritaria, self._tradicional_prioritaria]
-        for colas_prio in prioritarios:
-            if not colas_prio.is_empty():
-                p = colas_prio.first()
-                
-                if (self._t_actual - p.t_entrada) > 5:
-
-
-
-
-                    # ------------------------------------------------IA-----------------------------------------------------------
-                    if not hasattr(p, '_avisado_retraso'): # Comprueba si existe el flag
-                        print(f"tiempo {self._t_actual}: pedido {p.id_pedido} que entró en tiempo {p.t_entrada} RETRASADO")
-                        p._avisado_retraso = True
-                    # ------------------------------------------------IA-----------------------------------------------------------
-
-
-
-
-                    
-
-    def obtener_siguiente_pedido(self):
-
-        if not self._rapida_prioritaria.is_empty():
-            return self._rapida_prioritaria.dequeue()
-        
-        elif not self._tradicional_prioritaria.is_empty():
-            return self._tradicional_prioritaria.dequeue()
-        
-        elif not self._rapida_normal.is_empty():
-            return self._rapida_normal.dequeue()
-        
-        elif not self._tradicional_normal.is_empty():
-            return self._tradicional_normal.dequeue()
-
-        return None
-    
-    def gestionar_reparto(self):
-        
-        for p in self._pedidos_en_reparto[:]:
-            if self._t_actual == (p.t_inicio_reparto + p.duracion_entrega):
-                self._pedidos_en_reparto.remove(p)
-                self._repartidores += 1
-                print(f"tiempo {self._t_actual}: fin reparto pedido {p.id_pedido}, iniciado en tiempo {p.t_inicio_reparto}, duración: {p.duracion_entrega}")
-        
-        while self._repartidores > 0:
-            siguiente = self.obtener_siguiente_pedido()
-
-            if siguiente is not None:
-
-                siguiente.t_inicio_reparto = self._t_actual
-                self._pedidos_en_reparto.append(siguiente)
-                self._repartidores -= 1
-                print(f"tiempo {self._t_actual}: inicio reparto pedido {siguiente.id_pedido} que entró en tiempo {siguiente.t_entrada}, duración {siguiente.duracion_entrega}")
-            
-            else:
-                break
-
-    def avanzar_tiempo(self):
-        #Avanza el tiempo
-        self._t_actual += 1
-
-        if self._t_actual % 2 == 0 and not self._cola_registro.is_empty():
-            #Cada 2 de unidades de tiempo extraemos el pedido y lo clasificamos, guardando el tiempo de entrada
-            p = self._cola_registro.dequeue()
-            p.t_entrada = self._t_actual
-            self._clasificar_pedido(p)
-
-            print(f"tiempo {self._t_actual}: entrada de pedido {p.id_pedido} de comida {p.tipo}-{p.prioridad}, duración:{p.duracion_entrega}")
-
-        #Cada vez que avanza el tiempo comprobamos prioridades y retrasos
-        self.prioridades_y_retrasos()
-        self.gestionar_reparto()
-
-
-    '''
-    Hay que anadir la logica de asignacion de repartidores, reparto y
-    entregas de pedido. Tambien el control de los tiempos y de prioridades
-
-    Revisar excepciones y ver si podemos modificar la clase de pedido
-    para anadir getters y setters de los tiempos
-
-    Esta clase deberia funcionar como un servicio mas que como un
-    objeto instanciable, asique nos toca leer literatura y ver como
-    crear una buena estructura para la misma
-
-    Si puedo a la tarde creo un esquema logico para hacernos bien a la idea
-    de como implementarlo, pq me esta rayando la cabeza
-    '''
-
-    
-
+    @property
+    def pedidos_finalizados(self):
+        return self._pedidos_finalizados
