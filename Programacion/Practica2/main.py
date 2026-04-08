@@ -11,7 +11,17 @@ from linked_queue import LinkedQueue
 
 def cargar_pedidos_desde_archivo(ruta):
     """
-    Funcion que crea las 
+    Funcion que crea los pedidos y los añade a la cola de registro a partir de un archivo
+
+    Parameters
+    ----------
+    ruta : string
+        archivo con los datos para crear los pedidos
+
+    Returns
+        -------
+        LinkedQueue
+            Cola con los pedidos registrados
     """
     cola_registro = LinkedQueue()
 
@@ -42,6 +52,21 @@ def cargar_pedidos_desde_archivo(ruta):
     return cola_registro
 
 def crear_dataframe(pedidos:list):
+    """
+    Crea el dataframe con la info de los pedidos finalizados
+    para poder extraer despues las estadisticas
+
+    Parameters
+    ----------
+    pedidos : list
+        lista con todos los pedidos finalizados
+
+    Returns
+        -------
+        DataFrame
+            DataFrame con los datos a analizar
+        
+    """
     filas = []
 
     for pedido in pedidos:
@@ -55,6 +80,14 @@ def crear_dataframe(pedidos:list):
     return pd.DataFrame(filas)
 
 def mostrar_estadisticas(df:pd.DataFrame):
+    """
+    Muestra las estadisticas finales de la simulacion a partir del dataframe creado
+
+    Parameters
+    ----------
+    df : DataFrame
+        DataFrame de pandas con la info de los pedidos para analizar 
+    """
     tiempo_medio_espera_por_tipo = df.groupby("tipo")["tiempo_espera"].mean()
     porcentaje_escalados = df["escalado_automatico"].mean() * 100
     tiempo_total_medio = df["tiempo_total"].mean()
@@ -68,6 +101,14 @@ def mostrar_estadisticas(df:pd.DataFrame):
     print(f"\nTiempo total medio desde la entrada hasta la entrega: {tiempo_total_medio:.2f}")
 
 def mostrar_eventos(eventos:dict):
+    """
+    Muestra los eventos que van sucediendo a lo largo de la simulacion
+
+    Parameters
+    ----------
+    eventos : dict
+        diccionario con los eventos ocurridos durante esta iteracion de la simulacion
+    """
     #Pedidos registrados
     if eventos['pedido_registrado'] != None:
         pedido = eventos['pedido_registrado']
@@ -95,7 +136,7 @@ def mostrar_eventos(eventos:dict):
 
 if __name__ == '__main__':
     # Leer el archivo de configuración desde la línea de comandos o usar el predeterminado
-    ruta = sys.argv[1] if len(sys.argv) > 1 else "/home/iago/code/uni/prog/Practica1/Programacion/Practica2/pedidos_06.txt"
+    ruta = sys.argv[1] if len(sys.argv) > 1 else "pedidos_06.txt"
     #creamos la cola de registro que le pasaremos al gestor
     cola_registro = cargar_pedidos_desde_archivo(ruta)
     gestor = gestor_pedidos(cola_registro)
