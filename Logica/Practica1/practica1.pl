@@ -68,13 +68,33 @@ remplazar_elemento([Head|Tail],I, C, [Head|Result]) :-
 %Se llaman a los predicados correspondientes para realizar un cambio en las posiciones,
 %0 a todas las posibles
 expandir(S0, A, S1) :-
-    member(A, [n, s, e, w]), %ENCONTRADO EN INTERNET Inicializa A con cada uno de los elementos de la lista 
     localizar_pos(S0,0,Pos), %Buscamos el 0
     ady(Pos,A,R), %Miramos si pude ir a la dirección A(norte, sur, este, oeste)
     obtener_elemento(S0,R,ElementoCambio), %Obtenemos el elemento de la posicion A
     remplazar_elemento(S0,Pos,ElementoCambio,S), %Sustituir la posición Pos(Posición del 0) por PosCambio(Elemento A).
     remplazar_elemento(S,R,0,S1).   %Sustituir la posición R(Posición del elemento) por 0
 
+%buscar(Modo,nodo([],S0),[],Plan).
 
+%Busacar
+%Si el estado S(lista) del nodo es igual a la meta devolvemos P(pasos necesarios para llegar a S)
+buscar(_,[nodo(P,S)|_],_,P):-
+meta(S), !. %meta(S) devuelve true si S es igual a [1,2,3,4,5,6,7,8,0]
 
+buscar(Modo,[nodo(_,S)|Tail],Visitados,Plan) :-
+    member(S, Visitados), !, %este member se usa para ver si S esta en Visitados
+    buscar(Modo,Tail,Visitados,Plan). %En ese caso volvemos a llamar a buscar pero sin el 1º elemento en nodos
+
+buscar(profund,[nodo(P,S)|Tail],Visitados,Plan) :-
+    findall(nodo([M | P],S1),expandir(S,M,S1),Expandidos), %findall supongo xd
+    append(Expandidos,Tail, Nodos2), %creamos una nueva lista Nodos2, Expandidos se añadirá a la cabeza de la de Nodos
+    buscar(profund, Nodos2, [S|Visitados], Plan). %Volvemos a llamar a buscar pero con Nodos2 y añadiendo S a la lista de Visitados
+
+buscar(anchura,[nodo(P,S)|Tail],Visitados,Plan) :-
+    findall(nodo([M | P],S1),expandir(S,M,S1),Expandidos),%findall por segunda vez supongo xd
+    append(Tail, Expandidos, Nodos2),%creamos una nueva lista Nodos2, Expandidos se añadirá al cfinal de la de Nodos
+    buscar(anchura, Nodos2, [S|Visitados], Plan).%Volvemos a llamar a buscar pero con Nodos2 y añadiendo S a la lista de Visitados
+    
+plan(Modo,S0,Plan):- %Predicado plan para llamar a buscar
+    buscar(Modo,[nodo([],S0)],[],Plan).
 
