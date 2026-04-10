@@ -95,6 +95,25 @@ buscar(anchura,[nodo(P,S)|Tail],Visitados,Plan) :-
     append(Tail, Expandidos, Nodos2),%creamos una nueva lista Nodos2, Expandidos se añadirá al cfinal de la de Nodos
     buscar(anchura, Nodos2, [S|Visitados], Plan).%Volvemos a llamar a buscar pero con Nodos2 y añadiendo S a la lista de Visitados
     
+    
+busca_limite(_,_,S,Plan,Plan) :-
+    meta(S), !.
+    
+busca_limite(N,Max,S0,Plan0,Plan) :-
+    N < Max,
+    N2 is N + 1,
+    expandir(S0,P,S1),
+    busca_limite(N2,Max,S1,[P|Plan0],Plan).
+    
+generar_max(0).
+generar_max(N) :- 
+    generar_max(N1), 
+    N is N1 + 1.
+
 plan(Modo,S0,Plan):- %Predicado plan para llamar a buscar
     buscar(Modo,[nodo([],S0)],[],Plan).
 
+plan(iter,S0,Plan):- %Predicado plan para llamar a buscar
+    generar_max(Max),
+    busca_limite(0,Max,S0,[],Plan),
+    !.
