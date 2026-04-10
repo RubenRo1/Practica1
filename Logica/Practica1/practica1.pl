@@ -78,8 +78,29 @@ expandir(S0, A, S1) :-
     remplazar_elemento(S0,Pos,ElementoCambio,S), %Sustituir la posición Pos(Posición del 0) por PosCambio(Elemento A).
     remplazar_elemento(S,R,0,S1).   %Sustituir la posición R(Posición del elemento) por 0
 
+%buscar(Modo,nodo([],S0),[],Plan).
 
+%Busacar
+%Si el estado S(lista) del nodo es igual a la meta devolvemos P(pasos necesarios para llegar a S)
+buscar(_,[nodo(P,S)|_],_,P):-
+meta(S), !. %meta(S) devuelve true si S es igual a [1,2,3,4,5,6,7,8,0]
 
+buscar(Modo,[nodo(_,S)|Tail],Visitados,Plan) :-
+    member(S, Visitados), !, %este member se usa para ver si S esta en Visitados
+    buscar(Modo,Tail,Visitados,Plan). %En ese caso volvemos a llamar a buscar pero sin el 1º elemento en nodos
+
+buscar(profund,[nodo(P,S)|Tail],Visitados,Plan) :-
+    findall(nodo([M | P],S1),expandir(S,M,S1),Expandidos), %findall supongo xd
+    append(Expandidos,Tail, Nodos2), %creamos una nueva lista Nodos2, Expandidos se añadirá a la cabeza de la de Nodos
+    buscar(profund, Nodos2, [S|Visitados], Plan). %Volvemos a llamar a buscar pero con Nodos2 y añadiendo S a la lista de Visitados
+
+buscar(anchura,[nodo(P,S)|Tail],Visitados,Plan) :-
+    findall(nodo([M | P],S1),expandir(S,M,S1),Expandidos),%findall por segunda vez supongo xd
+    append(Tail, Expandidos, Nodos2),%creamos una nueva lista Nodos2, Expandidos se añadirá al cfinal de la de Nodos
+    buscar(anchura, Nodos2, [S|Visitados], Plan).%Volvemos a llamar a buscar pero con Nodos2 y añadiendo S a la lista de Visitados
+    
+plan(Modo,S0,Plan):- %Predicado plan para llamar a buscar
+    buscar(Modo,[nodo([],S0)],[],Plan).
 
 %[nodo([],[1,6,2,3,0,8,4,7,5])]
 %%% expandimos
