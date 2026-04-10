@@ -1,0 +1,6 @@
+cristal_etereo,6
+esencia_universal,12,*
+pluma_de_fenix,4
+polvo_de_luna,30
+raiz_de_mandragora,15
+savia_de_olmo,20

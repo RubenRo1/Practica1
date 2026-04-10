@@ -1,0 +1,7 @@
+brebaje_de_sueno,Cliente_Aldric
+pocion_de_teletransporte,Cliente_Lyra
+pocion_de_invisibilidad,Cliente_Mira
+elixir_de_fuerza,Cliente_Roran
+pocion_de_vigor,Cliente_Nara
+brebaje_de_sueno,Cliente_Orin
+pocion_de_invisibilidad,Cliente_Pip
