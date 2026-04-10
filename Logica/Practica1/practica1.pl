@@ -27,8 +27,11 @@ ady(X,w,R) :-
     R is X - 1,
     X mod 3 > 0.
 
-
 %localizar_pos() -> Localiza la posicion del cero
+%Existe una funcion nth0(Pos, lista, elemento) que nos da la posicion del elemento
+%El elemento que hay en la posicion X
+%O la lista resultante de quitar el elemento si a;adimos resultlist al final nth0(Pos, lista, elem, ResultList)
+%Tambien se puede usar para insertar en la posicion insertpos si lo invertimos, es decir nth0(insertpos, lista, elem, resultlist)
 
 %Caso base 
 %Si el primer elemento de la lista es un 0 devuelve la posición
@@ -68,7 +71,7 @@ remplazar_elemento([Head|Tail],I, C, [Head|Result]) :-
 %Se llaman a los predicados correspondientes para realizar un cambio en las posiciones,
 %0 a todas las posibles
 expandir(S0, A, S1) :-
-    member(A, [n, s, e, w]), %ENCONTRADO EN INTERNET Inicializa A con cada uno de los elementos de la lista 
+    % member(A, [n, s, e, w]), %ENCONTRADO EN INTERNET Inicializa A con cada uno de los elementos de la lista 
     localizar_pos(S0,0,Pos), %Buscamos el 0
     ady(Pos,A,R), %Miramos si pude ir a la dirección A(norte, sur, este, oeste)
     obtener_elemento(S0,R,ElementoCambio), %Obtenemos el elemento de la posicion A
@@ -78,3 +81,16 @@ expandir(S0, A, S1) :-
 
 
 
+%[nodo([],[1,6,2,3,0,8,4,7,5])]
+%%% expandimos
+%[,
+%nodo([s],[...])
+%nodo([e],[...])
+%nodo([w],[...])
+%]
+
+%Los nodos tienen forma nodo(P,S), P siendo el plan parcial y S el estado.
+%El primer nodo tendra forma nodo([],initial), ya que no hay un plan que nos haya llevado a el
+%Usamos la siguiente funcion para definir los siguientes nodos
+% findall(nodo([M | P],S1),expandir([1,2,3,7,4,6,5,0,8], M, S1),Expandidos).
+% insertaremos el resultado al principio o al final dependiendo de si es anchura o profundidad
