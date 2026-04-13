@@ -1,10 +1,13 @@
+% Rubén Rodríguez Catrufo ruben.rodriguez.catrufo@udc.es
+% Iago Núñez Lourés iago.nunez.loures@udc.es
 
 meta([1,2,3,4,5,6,7,8,0]). %Meta final
 
 %Estados iniciales
-initial1([1,2,3,7,4,6,5,0,8]).
-initial2([4,1,3,7,2,5,0,8,6]).
-initial3([1,6,2,3,0,8,4,7,5]).
+initial1([1,2,3,7,4,6,5,0,8]). %Longitud 5
+initial2([4,1,3,7,2,5,0,8,6]). %Longitud 6
+initial3([1,6,2,3,0,8,4,7,5]). %Longitud 12
+initial4([7,2,1,8,0,3,5,4,6]). %Longitud 20
 
 
 %Dice el elemento Norte(R) al numero X
@@ -27,32 +30,7 @@ ady(X,w,R) :-
     R is X - 1,
     X mod 3 > 0.
 
-
-%localizar_pos() -> Localiza la posicion del cero
-
-%Caso base 
-%Si el primer elemento de la lista es un 0 devuelve la posición
-localizar_pos([0|_], C, C) :- !.
-
-%Caso recursivo
-%Creamos un contador(C1) inicializado en C(0) y llamamos recursivamente a la funcion eliminando el 1 elemento de la lista
-localizar_pos([_|Tail],C,Pos) :-
-    C1 is C + 1,
-    localizar_pos(Tail,C1,Pos).
-
-%obtener_elemento() -> Obtiene el valor numerico de la posicion que se le pase como argumento
-
-%Caso base
-%Una vez el contador llegue a 0, devuelve el 1º elemento de la lista
-obtener_elemento([Head|_],0,Head) :- !.
-
-%Caso recursivo
-%Se crea un contador(C1) inicializado en la posicion que queremos obtener(C) se resta uno y llama recursivamente a la funcion eliminando el 1 elemento de la lista
-obtener_elemento([_|Tail],C,X) :-
-    C1 is C - 1,
-    obtener_elemento(Tail,C1,X).
-
-%remplazar_elemento() -> Sstutiye un elemento en una posicion por un nuevo elemento
+%remplazar_elemento(Lista, Indice, Elemento, Resultado) -> Sstutiye un elemento en una posicion por un nuevo elemento
 
 %Caso base
 %Si el índice es igual a 0 devuelve el nuevo elemento(C) más lo que queda de la lista 
@@ -65,22 +43,20 @@ remplazar_elemento([Head|Tail],I, C, [Head|Result]) :-
     I2 is I - 1,
     remplazar_elemento(Tail,I2,C,Result).
 
-%Se llaman a los predicados correspondientes para realizar un cambio en las posiciones,
-%0 a todas las posibles
+%expandir() ->Se llaman a los predicados correspondientes para realizar un cambio en las posiciones, y mostrar todos los movimientos
 expandir(S0, A, S1) :-
-    localizar_pos(S0,0,Pos), %Buscamos el 0
+    nth0(Pos,S0,0), %Buscamos el 0
     ady(Pos,A,R), %Miramos si pude ir a la dirección A(norte, sur, este, oeste)
-    obtener_elemento(S0,R,ElementoCambio), %Obtenemos el elemento de la posicion A
-    remplazar_elemento(S0,Pos,ElementoCambio,S), %Sustituir la posición Pos(Posición del 0) por PosCambio(Elemento A).
+    nth0(R,S0,ElementoCambio), %Obtiene el número q hay en R 
+    remplazar_elemento(S0,Pos,ElementoCambio,S), %Sustituir la posición Pos(Posición del 0) por ElementoCambio.
     remplazar_elemento(S,R,0,S1).   %Sustituir la posición R(Posición del elemento) por 0
 
 %buscar(Modo,nodo([],S0),[],Plan).
 
-%Busacar
 %Si el estado S(lista) del nodo es igual a la meta devolvemos P(pasos necesarios para llegar a S)
 buscar(_,[nodo(P,S)|_],_,P):-
-meta(S), !. %meta(S) devuelve true si S es igual a [1,2,3,4,5,6,7,8,0]
-
+    meta(S), !. %meta(S) devuelve true si S es igual a [1,2,3,4,5,6,7,8,0]
+    
 buscar(Modo,[nodo(_,S)|Tail],Visitados,Plan) :-
     member(S, Visitados), !, %este member se usa para ver si S esta en Visitados
     buscar(Modo,Tail,Visitados,Plan). %En ese caso volvemos a llamar a buscar pero sin el 1º elemento en nodos
@@ -97,23 +73,26 @@ buscar(anchura,[nodo(P,S)|Tail],Visitados,Plan) :-
     
     
 busca_limite(_,_,S,Plan,Plan) :-
-    meta(S), !.
+    meta(S), !. %Si la lista actual(S) es igual a la meta, devuelve el plan actual
     
 busca_limite(N,Max,S0,Plan0,Plan) :-
-    N < Max,
-    N2 is N + 1,
-    expandir(S0,P,S1),
-    busca_limite(N2,Max,S1,[P|Plan0],Plan).
-    
-generar_max(0).
-generar_max(N) :- 
-    generar_max(N1), 
-    N is N1 + 1.
+    N < Max, %Comprueba q N sea menor q Max
+    N2 is N + 1, %Suma 1 a N(Creando N2)
+    expandir(S0,P,S1), %Llamamos a expandir para generar un nuevo estado del 8 puzle(S1), y guardar el Plna(P)
+    busca_limite(N2,Max,S1,[P|Plan0],Plan). %Volvemos a llamar busca_limite pero añadiendo P al Plan0(plan actual)
 
 plan(Modo,S0,Plan):- %Predicado plan para llamar a buscar
-    buscar(Modo,[nodo([],S0)],[],Plan).
+    buscar(Modo,[nodo([],S0)],[],PlanR),
+    reverse(PlanR,Plan).
 
-plan(iter,S0,Plan):- %Predicado plan para llamar a buscar
-    generar_max(Max),
-    busca_limite(0,Max,S0,[],Plan),
-    !.
+plan(iter,S0,Plan):- %Predicado plan para llamar a busca_limite(itera)
+    itera(0,S0,Plan).
+
+itera(Max,S0,Plan) :- %Llama a busca_limite y devuelve el plan final
+    busca_limite(0,Max,S0,[],PlanR),
+     !,
+     reverse(PlanR,Plan).
+    
+itera(Max,S0,Plan) :- %Si la anterior llamada da false suma 1 a Max(contador) y vuelve a llamarse
+    Max2 is Max + 1,
+    itera(Max2,S0,Plan).
