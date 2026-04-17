@@ -1,0 +1,10 @@
+brebaje_de_sueno,polvo_de_luna,10
+brebaje_de_sueno,raiz_de_mandragora,5
+brebaje_de_sueno,savia_de_olmo,10
+elixir_de_fuerza,raiz_de_mandragora,8
+elixir_de_fuerza,savia_de_olmo,18
+pocion_de_invisibilidad,cristal_etereo,3
+pocion_de_invisibilidad,pluma_de_fenix,1
+pocion_de_invisibilidad,polvo_de_luna,12
+pocion_de_vigor,cristal_etereo,4
+pocion_de_vigor,raiz_de_mandragora,6
