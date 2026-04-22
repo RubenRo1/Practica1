@@ -27,4 +27,9 @@ if __name__ == "__main__":
     leer_ingredientes()
     leer_recetas() 
     leer_encargos()
-            
+
+"""
+almacen es dicc con ingrediente cantidad
+ingrediente es una clase con nombre y es_comodin
+libro de recetas es una clase que almacena un dicc con ingrediente y cantidad
+"""            
