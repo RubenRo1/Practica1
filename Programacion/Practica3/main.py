@@ -29,7 +29,8 @@ if __name__ == "__main__":
     leer_encargos()
 
 """
-almacen es dicc con ingrediente cantidad
+almacen es dicc con ingrediente cantidad (o quizas una clase laboratorio 
+que cree las pociones y almacene los ingredientes??)
 ingrediente es una clase con nombre y es_comodin
 libro de recetas es una clase que almacena un dicc con ingrediente y cantidad
 """            
