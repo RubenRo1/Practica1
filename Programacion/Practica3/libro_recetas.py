@@ -12,12 +12,11 @@ class libro_recetas:
         self._recetas = {} if recetas == None else recetas
 
     def __str__(self):
-        salida = ''
-        for receta in self._recetas.keys():
-            salida += f'{receta}\n\t{self._recetas[receta]}'
-            for ingrediente in self._recetas[receta]:
-                salida += f' {" | ".join(ingrediente.nombre, ": ", ingrediente.cantidad)}'
-            salida += '\n'
+        salida = ""
+        for receta in sorted(self._recetas.keys()):
+            salida += f"{receta}\n\t"
+            salida += " | ".join(str(ing) for ing in self._recetas[receta])
+            salida += "\n"
         return salida
 
     def existe_receta(self, pocion:str):

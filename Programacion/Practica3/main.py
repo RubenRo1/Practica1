@@ -6,114 +6,97 @@ from libro_recetas import libro_recetas
 from laboratorio import laboratorio
 
 
-def leer_ingredientes(path="ingredientes.txt"):
+def leer_ingredientes(path="/home/iago/code/uni/prog/Practica1/Programacion/Practica3/ingredientes.txt"):
     """
-    Lee el fichero de ingredientes y devuelve una lista posicional ordenada
-    con el almacén de esencias.
+    Lee el fichero de ingredientes disponibles y devuelve el almacén
+    como una Lista Posicional Ordenada.
     """
-    almacen = ListaAlmacen()
+    almacen_esencias = ListaAlmacen()
 
     with open(path, encoding="utf-8") as f:
-        for linea in f:
-            linea = linea.strip()
+        for l in f.readlines():
+            ls = l.strip().split(",")
 
-            if linea == "":
+            if len(ls) < 2:
                 continue
 
-            partes = linea.split(",")
+            es_comodin = len(ls) == 3 and ls[2] == "*"
+            nombre, cantidad = ls[0], int(ls[1])
 
-            nombre = partes[0]
-            cantidad = int(partes[1])
-            es_comodin = len(partes) == 3 and partes[2] == "*"
+            ingred = ingrediente(nombre, cantidad, es_comodin)
+            almacen_esencias.add(ingred)
 
-            almacen.add(ingrediente(nombre, cantidad, es_comodin))
+    print("--------ALMACEN DE ESENCIAS--------")
+    print(" | ".join(str(i) for i in almacen_esencias))
+    print()
 
-    return almacen
+    return almacen_esencias
 
 
-def leer_recetas(path="recetas.txt"):
+def leer_recetas(path="/home/iago/code/uni/prog/Practica1/Programacion/Practica3/recetas.txt"):
     """
-    Lee el fichero de recetas y devuelve un libro_recetas.
-    Cada poción tiene asociada una Lista Posicional Ordenada de ingredientes.
+    Lee el fichero de recetas y devuelve un objeto libro_recetas.
+    Cada poción tiene asociada su propia Lista Posicional Ordenada.
     """
     recetario = libro_recetas()
 
     with open(path, encoding="utf-8") as f:
-        for linea in f:
-            linea = linea.strip()
+        for l in f.readlines():
+            ls = l.strip().split(",")
 
-            if linea == "":
+            if len(ls) < 3:
                 continue
 
-            pocion, nombre_ingrediente, cantidad = linea.split(",")
+            pocion, ingr, cant = ls[0], ls[1], int(ls[2])
 
             if not recetario.existe_receta(pocion):
                 recetario.add_receta(pocion, ListaReceta())
 
-            lista_ingredientes = recetario.get_ingredientes(pocion)
-            lista_ingredientes.add(ingrediente(nombre_ingrediente, int(cantidad)))
+            recetario.add_ingrediente_receta(
+                pocion,
+                ingrediente(ingr, cant)
+            )
+
+    print("--------LIBRO DE RECETAS--------")
+    print(recetario)
 
     return recetario
 
 
-def imprimir_almacen_inicial(almacen):
+def leer_encargos(lab, path="/home/iago/code/uni/prog/Practica1/Programacion/Practica3/encargos.txt"):
     """
-    Imprime el almacén inicial en el formato pedido.
-    """
-    print("--------ALMACEN DE ESENCIAS--------")
-    print(" | ".join(str(ing) for ing in almacen))
-
-
-def imprimir_libro_recetas(recetario, titulo="--------LIBRO DE RECETAS--------"):
-    """
-    Imprime el libro de recetas.
-    """
-    print(titulo)
-    print(recetario, end="")
-
-
-def procesar_encargos(lab, path="encargos.txt"):
-    """
-    Procesa todos los encargos del fichero.
+    Procesa el fichero de encargos en orden de llegada.
+    La lógica de creación, actualización de stock y borrado de recetas
+    queda delegada en la clase laboratorio.
     """
     with open(path, encoding="utf-8") as f:
-        for linea in f:
-            linea = linea.strip()
+        for l in f.readlines():
+            ls = l.strip().split(",")
 
-            if linea == "":
+            if len(ls) < 2:
                 continue
 
-            pocion, cliente = linea.split(",")
+            pocion, cliente = ls[0], ls[1]
 
             print(f"Nuevo encargo: {pocion} | Solicitado por: {cliente}")
 
             print(lab.crear_pocion(pocion))
 
             agotados = lab.del_ingredientes_agotados(pocion)
-            if agotados:
-                print(agotados)
+            if agotados != "":
+                print(agotados, end="" if agotados.endswith("\n") else "\n")
 
             print(lab.stock_actual())
             print()
 
 
-def main():
+if __name__ == "__main__":
     almacen = leer_ingredientes()
     recetario = leer_recetas()
 
     lab = laboratorio(recetario, almacen)
 
-    imprimir_almacen_inicial(almacen)
-    imprimir_libro_recetas(recetario)
-    print()
+    leer_encargos(lab)
 
-    procesar_encargos(lab)
-
-    imprimir_libro_recetas(
-        recetario,
-        "--------LIBRO DE RECETAS FINAL--------"
-    )
-
-
-if __name__ == "__main__":
-    main()
+    print("--------LIBRO DE RECETAS FINAL--------")
+    print(recetario)
