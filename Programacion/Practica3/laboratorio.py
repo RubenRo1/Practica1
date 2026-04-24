@@ -13,14 +13,14 @@ class laboratorio:
 
     Gestiona el ciclo de vida de las pociones: desde la verificación de stock 
     hasta el procesamiento de carencias mediante la esencia universal y la 
-    limpieza de ingredientes agotados. [cite: 4, 9, 65]
+    limpieza de ingredientes agotados.
 
     Attributes
     ----------
     _recetario : libro_recetas
-        Instancia que contiene el diccionario de pócimas disponibles. [cite: 13]
+        Instancia que contiene el diccionario de pócimas disponibles. 
     _almacen : ListaOrdenada
-        Lista posicional basada en array con los ingredientes en stock. [cite: 10, 67]
+        Lista posicional basada en array con los ingredientes en stock.
     """
 
     def __init__(self, recetario:libro_recetas, almacen:ListaOrdenada):
@@ -45,8 +45,7 @@ class laboratorio:
         """
         Localiza un ingrediente en el almacén mediante búsqueda binaria.
 
-        Aprovecha que la lista está basada en arrays para lograr una 
-        eficiencia O(log n). [cite: 67]
+        Aprovecha que la lista está basada en arrays
 
         Parameters
         ----------
@@ -81,10 +80,10 @@ class laboratorio:
 
     def crear_pocion(self, pocion:str):
         """
-        Procesa el encargo de una poción específica. [cite: 27]
+        Procesa el encargo de una poción específica.
 
         Verifica disponibilidad, calcula carencias y determina si el encargo 
-        puede ser atendido con o sin ayuda de la esencia universal. [cite: 5, 7]
+        puede ser atendido con o sin ayuda de la esencia universal.
 
         Parameters
         ----------
@@ -94,7 +93,7 @@ class laboratorio:
         Returns
         -------
         str
-            Mensaje detallado con el resultado del encargo. [cite: 28-51]
+            Mensaje detallado con el resultado del encargo.
         """
         salida = ''
         if not self._recetario.existe_receta(pocion):
@@ -131,10 +130,10 @@ class laboratorio:
 
     def del_ingredientes_agotados(self, pocion):
         """
-        Limpia el almacén y el recetario tras procesar un encargo. [cite: 6, 52]
+        Limpia el almacén y el recetario tras procesar un encargo.
 
         Elimina ingredientes con cantidad 0 y purga las recetas que los 
-        requieren (borrado en cascada). [cite: 52-55]
+        requieren (borrado en cascada).
 
         Parameters
         ----------
@@ -173,7 +172,7 @@ class laboratorio:
 
     def _suplir_carencias(self, carencias):
         """
-        Calcula si la esencia universal puede cubrir las faltas detectadas. [cite: 39]
+        Calcula si la esencia universal puede cubrir las faltas detectadas.
 
         Parameters
         ----------
@@ -236,7 +235,7 @@ class laboratorio:
 
     def stock_actual(self):
         """
-        Genera una cadena con el estado visual del almacén. [cite: 58-59]
+        Genera una cadena con el estado visual del almacén. 
 
         Returns
         -------
