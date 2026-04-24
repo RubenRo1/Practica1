@@ -11,16 +11,15 @@ class laboratorio:
 
     def __init__(self, recetario:libro_recetas, almacen:ListaOrdenada):
         self._recetario= recetario
-        #que el almacen sea una lista posicional y no un diccionario solo complica las cosas
-        #Es un mal uso de una lista posicional, ya que el orden de los ingredientes es irrelevante
-        #y se deberia priorizar el facil acceso a los mismos
-
         #Usaremos una la lista ordenada de array ya que nos sera mas facil hacer la busqueda de losm ingredientes
         self._almacen = almacen
 
-    def _encontrar_ingrediente(self, elemento:ingrediente):
+    def _encontrar_ingrediente(self, elemento):
         #Al ser una lista basada en arrays, podemos realizar busqueda binaria,
         #ya que las posiciones son numeros enteros
+        #A veces querremos buscar solo por nombre, sin dar un elemento
+        nombre = elemento if isinstance(elemento, str) else elemento.nombre
+
         if self._almacen.is_empty():
             return None
 
@@ -31,15 +30,14 @@ class laboratorio:
             medio = (izquierda + derecha) // 2
             ingrediente = self._almacen.get_element(medio)
 
-            if ingrediente.nombre == elemento.nombre:
+            if ingrediente.nombre == nombre:
                 return medio
-            elif ingrediente.nombre < elemento.nombre:
+            elif ingrediente.nombre < nombre:
                 izquierda = medio + 1
             else:
                 derecha = medio - 1
 
         return None
-
 
     def crear_pocion(self, pocion:str):
         #Comprobamos que exista receta y la sacamos
@@ -49,12 +47,14 @@ class laboratorio:
         salida += f'{self._recetario.get_receta(pocion)}\n'
         ingredientes = self._recetario.get_ingredientes(pocion)
 
-        carencias = self._check_carencias(ingredientes)
+        carencias, posiciones = self._check_carencias(ingredientes)
 
         #Los diccionarios vacios devuelven falso al checkearlos
         if not carencias:
             #Si no hay carencias, se atiende el encargo
             salida += f'Encargo {pocion} ATENDIDO'
+            for pos, ingrediente in zip(posiciones, ingredientes):
+                self._almacen.get_element(pos).cantidad -= ingrediente.cantidad
             return salida
         
         #Si hay carencias, llamamos al metodo de suplir carencias
@@ -63,7 +63,8 @@ class laboratorio:
         if not encargo_existoso:
             salida += f'Encargo {pocion} FALLIDO.\nFaltan (Sin comodin suficiente):\n'
             #Respectivos ingredientes con las cantidades que faltan
-            salida = salida.join(f'\t- {self._almacen.get_element(ingrediente).nombre}: {carencias[ingrediente]}\n'for ingrediente in carencias.keys())
+            for pos in carencias.keys():
+                salida += f"\t- {self._almacen.get_element(pos).nombre}: {carencias[pos]}\n"
             #Stock de la esencia
             salida += f'Esencia universal:\n\t- disponible: {stock_esencia}\n\t- necesaria: {carencia_total}\n'
             return salida
@@ -73,21 +74,38 @@ class laboratorio:
         salida = salida.join(f'\t- {self._almacen.get_element(ingrediente).nombre}: {carencias[ingrediente]}\n'for ingrediente in carencias.keys())
         return salida
 
-
     def del_ingredientes_agotados(self, pocion):
-        for ingrediente in 
-
-    def add_ingrediente():
-        pass
+        salida = ''
+        #Puede que la receta no exista
+        if not self._recetario.existe_receta(pocion):
+            return salida
     
+        for ingrediente in self._recetario.recetas[pocion]:
+            pos = self._encontrar_ingrediente(ingrediente)
+            ingrediente_almacen = self._almacen.get_element(pos)
+
+            if ingrediente_almacen.cantidad == 0:
+                self._almacen.delete(pos)
+                recetas_a_eliminar = self._recetario.del_pociones_por_ingrediente(ingrediente)
+                for receta in recetas_a_eliminar:
+                    salida += f'Agotado: {ingrediente.nombre} | Borrada: receta de {receta}\n'
+
+        pos = self._encontrar_ingrediente('esencia_universal')
+        esencia = self._almacen.get_element(pos) if pos != None else None
+        
+        if esencia != None and esencia.cantidad == 0:
+            salida += 'Agotado esencia universal (*)'
+            self._almacen.delete(pos)
+
+        return salida
 
     def _suplir_carencias(self, carencias):
         #Calculamos la carencia total
         carencia_total = sum(carencias.values())
 
-        esencia = self._almacen.get_element(
-                  self._encontrar_ingrediente('esencia_universal')
-                  )
+        pos = self._encontrar_ingrediente('esencia_universal')
+        esencia = self._almacen.get_element(pos) if pos != None else None
+
         stock_esencia = 0 if esencia == None else esencia.cantidad
 
         #Si hay suficiente esencia, acualizamos la cantidades
@@ -97,14 +115,12 @@ class laboratorio:
                 self._almacen.get_element(ingrediente).cantidad = 0
 
         return stock_esencia >= carencia_total, carencia_total, stock_esencia
-
-
-
     
     def _check_carencias(self, ingredientes:ListaOrdenada):
         
         #Almacenamos las posiciones en el almacen y la carencia del ingrediente
         carencias = {}
+        posiciones = []
         for ingrediente in ingredientes:
             pos = self._encontrar_ingrediente(ingrediente)
             ingrediente_almacen = self._almacen.get_element(pos)
@@ -114,15 +130,15 @@ class laboratorio:
                 #en caso de que se pueda hacer la receta
                 carencias[pos] = ingrediente.cantidad - ingrediente_almacen.cantidad
             else:
-                ingrediente_almacen.cantidad -= ingrediente.cantidad
+                posiciones.append(pos)
+            
         
-        return carencias
+        return carencias, posiciones
 
-
-
-
-    def stock_actual():
-        pass
+    def stock_actual(self):
+        salida = "--------STOCK ACTUAL--------\n"
+        salida += " | ".join(str(ing) for ing in self._almacen)
+        return salida        
 
     '''
     getters y setters

@@ -3,7 +3,12 @@ Autores:
     Iago Núñez Lourés - iago.nunez.loures@udc.es
     Rubén Rodríguez Catrufo - ruben.rodriguez.catrufo@udc.es
 """
+from functools import total_ordering
 
+#Como los ingredientes van a ir en listas posicionales, necesitamos poder compararlos.
+#Con el uso de @total ordering, nos ahorramos el reescribir todos los metodos magicos
+#de comparacion, y asi podremos comparar simplemente a partir de eq y lt
+@total_ordering
 class ingrediente:
     """Representa un ingrediente dentro del sistema de pociones.
 
@@ -19,6 +24,8 @@ class ingrediente:
     _es_comodin : bool
         Indica si el ingrediente puede sustituir a otros en una receta.
     """
+
+
     def __init__(self, nombre, cantidad:int,es_comodin=False ):
         """Inicializa un nuevo objeto ingrediente.
 
@@ -39,18 +46,15 @@ class ingrediente:
         self._cantidad = cantidad
         self._es_comodin = es_comodin
 
-    def __gt__(self, otro):
-        return self._cantidad > otro.cantidad
-
-    def __ge__(self, otro):
-        return self._cantidad >= otro.cantidad
+    def __lt__(self, otro):
+        return self._nombre < otro.nombre
     
     def __eq__(self,value):
-        return self._nombre == value._nombre
+        return self._nombre == value.nombre
 
     def __str__(self):
-        return f'{self._nombre} {'(*)' if self._es_comodin else ''}: {self._cantidad}'
-    
+        marca = " (*)" if self._es_comodin else ""
+        return f"{self._nombre}{marca}: {self._cantidad}"
     
     @property
     def nombre(self):
