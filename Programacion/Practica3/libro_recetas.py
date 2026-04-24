@@ -39,7 +39,7 @@ class libro_recetas:
         for receta in self._recetas.keys():
             salida += f'{receta}\n\t{self._recetas[receta]}'
             for ingrediente in self._recetas[receta]:
-                salida += f'{ingrediente.nombre}: {self._recetas[receta][ingrediente]} | '
+                salida += f' {" | ".join(ingrediente.nombre, ": ", self._recetas[receta])}'#Cambiar para que funcione con la lista ordenada
             salida += '\n'
         return salida
     
