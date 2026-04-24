@@ -6,10 +6,22 @@ from libro_recetas import libro_recetas
 from laboratorio import laboratorio
 
 
-def leer_ingredientes(path="/home/iago/code/uni/prog/Practica1/Programacion/Practica3/ingredientes.txt"):
+def leer_ingredientes(path="ingredientes.txt"):
     """
-    Lee el fichero de ingredientes disponibles y devuelve el almacén
-    como una Lista Posicional Ordenada.
+    Lee el fichero de ingredientes y carga el almacén de esencias.
+
+    Crea una Lista Posicional Ordenada basada en arrays para permitir 
+    búsquedas binarias eficientes en el laboratorio.
+
+    Parameters
+    ----------
+    path : str, optional
+        Ruta del fichero de texto (por defecto "ingredientes.txt").
+
+    Returns
+    -------
+    ListaAlmacen
+        Lista con objetos de la clase ingrediente cargados y ordenados.
     """
     almacen_esencias = ListaAlmacen()
 
@@ -33,7 +45,7 @@ def leer_ingredientes(path="/home/iago/code/uni/prog/Practica1/Programacion/Prac
     return almacen_esencias
 
 
-def leer_recetas(path="/home/iago/code/uni/prog/Practica1/Programacion/Practica3/recetas.txt"):
+def leer_recetas(path="recetas.txt"):
     """
     Lee el fichero de recetas y devuelve un objeto libro_recetas.
     Cada poción tiene asociada su propia Lista Posicional Ordenada.
@@ -63,7 +75,7 @@ def leer_recetas(path="/home/iago/code/uni/prog/Practica1/Programacion/Practica3
     return recetario
 
 
-def leer_encargos(lab, path="/home/iago/code/uni/prog/Practica1/Programacion/Practica3/encargos.txt"):
+def leer_encargos(lab, path="encargos.txt"):
     """
     Procesa el fichero de encargos en orden de llegada.
     La lógica de creación, actualización de stock y borrado de recetas
@@ -77,7 +89,7 @@ def leer_encargos(lab, path="/home/iago/code/uni/prog/Practica1/Programacion/Pra
                 continue
 
             pocion, cliente = ls[0], ls[1]
-
+            print("\n--------------------------------\n\n")
             print(f"Nuevo encargo: {pocion} | Solicitado por: {cliente}")
 
             print(lab.crear_pocion(pocion))

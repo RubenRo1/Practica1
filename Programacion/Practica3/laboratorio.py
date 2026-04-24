@@ -8,16 +8,56 @@ from ingrediente import ingrediente
 from array_ordered_positional_list import ArrayOrderedPositionalList as ListaOrdenada
 
 class laboratorio:
+    """
+    Clase controladora que orquesta la interacción entre el almacén y el recetario.
+
+    Gestiona el ciclo de vida de las pociones: desde la verificación de stock 
+    hasta el procesamiento de carencias mediante la esencia universal y la 
+    limpieza de ingredientes agotados.
+
+    Attributes
+    ----------
+    _recetario : libro_recetas
+        Instancia que contiene el diccionario de pócimas disponibles. 
+    _almacen : ListaOrdenada
+        Lista posicional basada en array con los ingredientes en stock.
+    """
 
     def __init__(self, recetario:libro_recetas, almacen:ListaOrdenada):
+        """
+        Inicializa el laboratorio con sus dos estructuras principales.
+
+        Parameters
+        ----------
+        recetario : libro_recetas
+            El libro que contiene las recetas cargadas.
+        almacen : ListaOrdenada
+            La lista de existencias disponibles.
+        
+        Returns
+        -------
+        None.
+        """
         self._recetario= recetario
-        #Usaremos una la lista ordenada de array ya que nos sera mas facil hacer la busqueda de losm ingredientes
         self._almacen = almacen
 
     def _encontrar_ingrediente(self, elemento):
-        #Al ser una lista basada en arrays, podemos realizar busqueda binaria,
-        #ya que las posiciones son numeros enteros
-        #A veces querremos buscar solo por nombre, sin dar un elemento
+        """
+        Localiza un ingrediente en el almacén mediante búsqueda binaria.
+
+        Aprovecha que la lista está basada en arrays para realizar una 
+        búsqueda binaria sobre las posiciones.
+
+        Parameters
+        ----------
+        elemento : ingrediente or str
+            Objeto ingrediente o cadena de texto con el nombre a buscar.
+
+        Returns
+        -------
+        int or None
+            La posición (índice) en el array si se encuentra, None si no.
+        """
         nombre = elemento if isinstance(elemento, str) else elemento.nombre
 
         if self._almacen.is_empty():
@@ -40,7 +80,22 @@ class laboratorio:
         return None
 
     def crear_pocion(self, pocion:str):
-        #Comprobamos que exista receta y la sacamos
+        """
+        Procesa el encargo de una poción específica.
+
+        Verifica disponibilidad, calcula carencias y determina si el encargo 
+        puede ser atendido con o sin ayuda de la esencia universal.
+
+        Parameters
+        ----------
+        pocion : str
+            Nombre de la poción solicitada.
+
+        Returns
+        -------
+        str
+            Mensaje detallado con el resultado del encargo.
+        """
         salida = ''
         if not self._recetario.existe_receta(pocion):
             return f'Encargo NO ATENDIDO. Receta de {pocion} desconocida'
@@ -81,6 +136,23 @@ class laboratorio:
         return salida
 
     def del_ingredientes_agotados(self, pocion):
+        """
+        Limpia el almacén y el recetario tras procesar un encargo.
+
+        Elimina ingredientes con cantidad 0 y purga las recetas que los 
+        requieren (borrado en cascada).
+
+        Parameters
+        ----------
+        pocion : str
+            Nombre de la poción recién procesada.
+
+        Returns
+        -------
+        str
+            Registro de ingredientes agotados y recetas eliminadas.
+        """
+
         salida = ''
         #Puede que la receta no exista
         if not self._recetario.existe_receta(pocion):
@@ -106,6 +178,20 @@ class laboratorio:
         return salida
 
     def _suplir_carencias(self, carencias):
+        """
+        Calcula si la esencia universal puede cubrir las faltas detectadas.
+
+        Parameters
+        ----------
+        carencias : dict
+            Diccionario {posicion_almacen: cantidad_faltante}.
+
+        Returns
+        -------
+        tuple
+            (bool: exito, int: carencia_total, int: stock_disponible).
+        """
+
         #Calculamos la carencia total
         carencia_total = sum(carencias.values())
 
@@ -123,7 +209,24 @@ class laboratorio:
         return stock_esencia >= carencia_total, carencia_total, stock_esencia
     
     def _check_carencias(self, ingredientes:ListaOrdenada):
-        
+        """
+        Compara los requisitos de una receta con el stock actual.
+
+        Parameters
+        ----------
+        ingredientes_necesarios : ListaOrdenada
+            Ingredientes y cantidades que pide la receta.
+
+        Returns
+        -------
+        Returns
+        -------
+        tuple
+            Par formado por:
+            - dict {posicion_almacen: cantidad_faltante}
+            - list de tuplas (posicion_almacen, cantidad_a_consumir)
+        """
+
         #Almacenamos las posiciones en el almacen y la carencia del ingrediente
         carencias = {}
         consumos = []
@@ -142,6 +245,14 @@ class laboratorio:
         return carencias, consumos
 
     def stock_actual(self):
+        """
+        Genera una cadena con el estado visual del almacén. 
+
+        Returns
+        -------
+        str
+            Representación formateada del stock.
+        """
         salida = "--------STOCK ACTUAL--------\n"
         salida += " | ".join(str(ing) for ing in self._almacen)
         return salida        

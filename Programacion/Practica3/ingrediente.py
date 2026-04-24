@@ -25,7 +25,6 @@ class ingrediente:
         Indica si el ingrediente puede sustituir a otros en una receta.
     """
 
-
     def __init__(self, nombre, cantidad:int,es_comodin=False ):
         """Inicializa un nuevo objeto ingrediente.
 
@@ -47,12 +46,48 @@ class ingrediente:
         self._es_comodin = es_comodin
 
     def __lt__(self, otro):
+        """
+        Define la relación 'menor que' para la ordenación alfabética.
+
+        Parameters
+        ----------
+        otro : ingrediente
+            El otro objeto ingrediente con el que comparar.
+
+        Returns
+        -------
+        bool
+            True si el nombre de este ingrediente es alfabéticamente menor.
+        """
         return self._nombre < otro.nombre
     
     def __eq__(self,value):
+        """
+        Define la igualdad entre ingredientes basada en el nombre.
+
+        Parameters
+        ----------
+        value : ingrediente
+            El objeto con el que comparar la igualdad.
+
+        Returns
+        -------
+        bool
+            True si ambos ingredientes tienen el mismo nombre.
+        """
+        if not isinstance(value, ingrediente):
+            return False
         return self._nombre == value.nombre
 
     def __str__(self):
+        """
+        Genera la representación visual del ingrediente.
+
+        Returns
+        -------
+        str
+            Cadena formateada según el requisito (ej: "Agua (*): 5").
+        """
         marca = " (*)" if self._es_comodin else ""
         return f"{self._nombre}{marca}: {self._cantidad}"
     
