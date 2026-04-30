@@ -63,12 +63,12 @@ buscar(Modo,[nodo(_,S)|Tail],Visitados,Plan) :-
     buscar(Modo,Tail,Visitados,Plan). %En ese caso volvemos a llamar a buscar pero sin el 1º elemento en nodos
 
 buscar(profund,[nodo(P,S)|Tail],Visitados,Plan) :-
-    findall(nodo([M | P],S1),expandir(S,M,S1),Expandidos), %findall supongo xd
+    findall(nodo([M | P],S1),expandir(S,M,S1),Expandidos), %findall supongo
     append(Expandidos,Tail, Nodos2), %creamos una nueva lista Nodos2, Expandidos se añadirá a la cabeza de la de Nodos
     buscar(profund, Nodos2, [S|Visitados], Plan). %Volvemos a llamar a buscar pero con Nodos2 y añadiendo S a la lista de Visitados
 
 buscar(anchura,[nodo(P,S)|Tail],Visitados,Plan) :-
-    findall(nodo([M | P],S1),expandir(S,M,S1),Expandidos),%findall por segunda vez supongo xd
+    findall(nodo([M | P],S1),expandir(S,M,S1),Expandidos),%findall por segunda vez supongo
     append(Tail, Expandidos, Nodos2),%creamos una nueva lista Nodos2, Expandidos se añadirá al cfinal de la de Nodos
     buscar(anchura, Nodos2, [S|Visitados], Plan).%Volvemos a llamar a buscar pero con Nodos2 y añadiendo S a la lista de Visitados
     
