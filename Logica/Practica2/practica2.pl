@@ -15,15 +15,17 @@
 % G = forall x :: p(x, f(a))
 % subs(X/T, A & B, A1 & B1) :- subs(X/T, A, A1), subs(X/T,B,B1).
 
-%Caso F es un atomo
-% subs(_/_, F, T) :- 
-%     F =..[_|T].
-
-% %Variable
+%Variable
+%Si F es X, el resultado G es directamente el término T.
 subs(X/T, X, T) :- !.
 
+%Átomo
+%Si es algo atómico (no compuesto) y no entró en la regla anterior, se queda igual.
+subs(_, A, A) :-
+    atomic(A), !. 
 
-%Caso F es un and y or
+%Conectores binarios (&, v, ->, <-, <->)
+%Descomponemos la fórmula, llamamos recursivamente a cada lado y volvemos a montar.
 subs(X/T, A & B, A1 & B1) :- 
     !,
     subs(X/T, A, A1), 
@@ -34,31 +36,65 @@ subs(X/T, A v B, A1 v B1) :-
     subs(X/T, A, A1), 
     subs(X/T, B, B1).
 
+subs(X/T, A -> B, A1 -> B1) :- 
+    !,
+    subs(X/T, A, A1),
+    subs(X/T, B, B1).
+
+subs(X/T, A <- B, A1 <- B1) :- 
+    !,
+    subs(X/T, A, A1),
+    subs(X/T, B, B1).
+
+subs(X/T, A <-> B, A1 <-> B1) :- 
+    !,
+    subs(X/T, A, A1),
+    subs(X/T, B, B1).  
+
+%Negacion
+%Caso unario: bajamos a la fórmula A, la modificamos a A1 y mantenemos el '-'.
+subs(X/T, -A, -A1) :-
+    !,
+    subs(X/T, A, A1).
+
+%forall/exits
+%Si intentamos sustituir X, pero X está ligada por un forall/exists, NO tocamos nada.
+subs(X/_, forall X :: F, forall X :: F) :- !.
+subs(X/T, exists X :: F, exists X :: F) :- !.
+
+
+%Si el cuantificador es sobre otra variable (Y), entramos a sustituir en la fórmula F.
+subs(X/T, forall Y :: F, forall Y :: G) :- !,
+    subs(X/T, F, G).
+
+subs(X/T, exists Y :: F, exists Y :: G) :- !,
+    subs(X/T, F, G).
+
+%Usamos el operador (=..) para separar el nombre del predicado (p/f...) de sus argumentos(x, x v y...).
 subs(X/T, F, G) :-
-    X == F, !,
-    G = T.
+    F =.. [Pred|Argum], %Separamos el nombre del predicado
+    recorrer_subs(X/T,Argum, Argum2), %Recorremos la lista de argumentos
+    G =.. [Pred|Argum2]. %Devolvemos el nombre del predicado + los nuevos argumentos
 
-subs(_/_, F, F).
+    
+    %Lista de argumentos
+    %Caso base: la lista vacía se queda vacía.
+    recorrer_subs(_, [], []).
 
+%Caso recursivo: procesamos la cabeza (H) y seguimos con el resto (Tail).
+recorrer_subs(X/T, [H|Tail], [H1|T1]) :-
+    subs(X/T, H, H1), 
+    recorrer_subs(X/T, Tail, T1).
 
+%Caso base: si no hay más sustituciones, la fórmula no cambia.
+subs_list([], F , F).
 
-
-
-
-% subs(X/T, A v B, A) :- !.
-    % subs(X/T, A, A1), 
-    % subs(X/T, B, B1).
-
-
-% subs_arg(_,[],[]).
-% subs_arg(X/T,[Head|Tail],[Head1|Tail1]) :-
-%     subs(X/T, Head, Head1),
-%     subs_arg(X/T, Tail, Tail1).
-
-% subs(X/T, A & B, T) :-
-% F =..[A|T1],
-% A == X,!.
-
+%Caso recursivo: aplicamos la primera sustitución (H) a F obteniendo G,
+%y usamos ese G como entrada para el resto de la lista (T).
+subs_list([H|T], F, G1) :-
+    subs(H, F, G),
+    !,
+    subs_list(T, G, G1).
 
 
 
