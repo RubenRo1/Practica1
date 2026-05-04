@@ -75,6 +75,8 @@ class ingrediente:
         bool
             True si ambos ingredientes tienen el mismo nombre.
         """
+        if not isinstance(value, ingrediente):
+            return False
         return self._nombre == value.nombre
 
     def __str__(self):

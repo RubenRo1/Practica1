@@ -45,7 +45,8 @@ class laboratorio:
         """
         Localiza un ingrediente en el almacén mediante búsqueda binaria.
 
-        Aprovecha que la lista está basada en arrays
+        Aprovecha que la lista está basada en arrays para realizar una 
+        búsqueda binaria sobre las posiciones.
 
         Parameters
         ----------
@@ -97,18 +98,18 @@ class laboratorio:
         """
         salida = ''
         if not self._recetario.existe_receta(pocion):
-            return f'Encargo NO ATENDIDO. Receta de {pocion} deconocida'
+            return f'Encargo NO ATENDIDO. Receta de {pocion} desconocida'
         salida += f'{self._recetario.get_receta(pocion)}\n'
         ingredientes = self._recetario.get_ingredientes(pocion)
 
-        carencias, posiciones = self._check_carencias(ingredientes)
+        carencias, consumos = self._check_carencias(ingredientes)
 
         #Los diccionarios vacios devuelven falso al checkearlos
         if not carencias:
             #Si no hay carencias, se atiende el encargo
             salida += f'Encargo {pocion} ATENDIDO'
-            for pos, ingrediente in zip(posiciones, ingredientes):
-                self._almacen.get_element(pos).cantidad -= ingrediente.cantidad
+            for pos, cantidad in consumos:
+                self._almacen.get_element(pos).cantidad -= cantidad
             return salida
         
         #Si hay carencias, llamamos al metodo de suplir carencias
@@ -121,11 +122,17 @@ class laboratorio:
                 salida += f"\t- {self._almacen.get_element(pos).nombre}: {carencias[pos]}\n"
             #Stock de la esencia
             salida += f'Esencia universal:\n\t- disponible: {stock_esencia}\n\t- necesaria: {carencia_total}\n'
+            salida += 'Receta ELIMINADA'
+            self._recetario.del_receta(pocion)
             return salida
         
-        #si se pueden suplir
-        salida += 'Suplido con esencia universal:\n'
-        salida = salida.join(f'\t- {self._almacen.get_element(ingrediente).nombre}: {carencias[ingrediente]}\n'for ingrediente in carencias.keys())
+        #si se pueden suplir, eliminamos stock de aquellos que si se pudieron usar sin requerir esencia
+        for pos, cantidad in consumos:
+                self._almacen.get_element(pos).cantidad -= cantidad
+        salida += f'Encargo {pocion} ATENDIDO.\n'
+        salida += 'Suplido con esencia_universal:\n'
+        for pos in carencias.keys():
+            salida += f'\t- {self._almacen.get_element(pos).nombre}: faltaban {carencias[pos]}\n'
         return salida
 
     def del_ingredientes_agotados(self, pocion):
@@ -162,10 +169,10 @@ class laboratorio:
                     salida += f'Agotado: {ingrediente.nombre} | Borrada: receta de {receta}\n'
 
         pos = self._encontrar_ingrediente('esencia_universal')
-        esencia = self._almacen.get_element(pos) if pos != None else None
+        esencia = self._almacen.get_element(pos) if pos is not None else None
         
-        if esencia != None and esencia.cantidad == 0:
-            salida += 'Agotado esencia universal (*)'
+        if esencia is not None and esencia.cantidad == 0:
+            salida += 'Agotado esencia universal (*)\n'
             self._almacen.delete(pos)
 
         return salida
@@ -189,9 +196,9 @@ class laboratorio:
         carencia_total = sum(carencias.values())
 
         pos = self._encontrar_ingrediente('esencia_universal')
-        esencia = self._almacen.get_element(pos) if pos != None else None
+        esencia = self._almacen.get_element(pos) if pos is not None else None
 
-        stock_esencia = 0 if esencia == None else esencia.cantidad
+        stock_esencia = 0 if esencia is None else esencia.cantidad
 
         #Si hay suficiente esencia, acualizamos la cantidades
         if stock_esencia >= carencia_total:
@@ -212,13 +219,17 @@ class laboratorio:
 
         Returns
         -------
+        Returns
+        -------
         tuple
-            (dict de carencias, list de posiciones con stock suficiente).
+            Par formado por:
+            - dict {posicion_almacen: cantidad_faltante}
+            - list de tuplas (posicion_almacen, cantidad_a_consumir)
         """
 
         #Almacenamos las posiciones en el almacen y la carencia del ingrediente
         carencias = {}
-        posiciones = []
+        consumos = []
         for ingrediente in ingredientes:
             pos = self._encontrar_ingrediente(ingrediente)
             ingrediente_almacen = self._almacen.get_element(pos)
@@ -228,10 +239,10 @@ class laboratorio:
                 #en caso de que se pueda hacer la receta
                 carencias[pos] = ingrediente.cantidad - ingrediente_almacen.cantidad
             else:
-                posiciones.append(pos)
+                consumos.append((pos, ingrediente.cantidad))
             
         
-        return carencias, posiciones
+        return carencias, consumos
 
     def stock_actual(self):
         """
