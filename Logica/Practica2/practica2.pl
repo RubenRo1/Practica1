@@ -77,14 +77,15 @@ subs(X/T, F, G) :-
     G =.. [Pred|Argum2]. %Devolvemos el nombre del predicado + los nuevos argumentos
 
     
-    %Lista de argumentos
-    %Caso base: la lista vacía se queda vacía.
-    recorrer_subs(_, [], []).
+%Lista de argumentos
+%Caso base: la lista vacía se queda vacía.
+recorrer_subs(_, [], []).
 
 %Caso recursivo: procesamos la cabeza (H) y seguimos con el resto (Tail).
 recorrer_subs(X/T, [H|Tail], [H1|T1]) :-
     subs(X/T, H, H1), 
     recorrer_subs(X/T, Tail, T1).
+    
 
 %Caso base: si no hay más sustituciones, la fórmula no cambia.
 subs_list([], F , F).
@@ -97,4 +98,6 @@ subs_list([H|T], F, G1) :-
     subs_list(T, G, G1).
 
 
-
+%EJERCICIO OPCIONAL
+%Añadir dos argumentos, una lista en la que añado todos los argumentos cuantificados y los que estan libres
+%La lista puede ser un par la variable + la parte de la formula donde fue cuantificada, par mostrar en el mensaje de error
