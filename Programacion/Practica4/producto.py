@@ -1,8 +1,8 @@
 
 
 class producto:
-    def __init__(self, codigo_barra, nombre, categoria, precio, stock, proveedores:list, fecha):
-        self.codigo_barra = codigo_barra
+    def __init__(self, ean, nombre, categoria, precio, stock, proveedores:list, fecha):
+        self.ean = ean
         self.nombre = nombre
         self.categoria = categoria
         self.precio = precio
