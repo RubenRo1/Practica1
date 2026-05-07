@@ -1,0 +1,5 @@
+codigo_barras,nombre,categoria,precio,stock,proveedores,fecha_reposicion
+10,Arroz Largo 1kg,Cereales,2.10,300,"['Arrocera Valencia']",2025-04-10
+15,Jamon York 200g,Embutidos,1.00,200,"['Fiambres SA','Porco Celta']",2025-04-13
+14,Aceite Oliva Virgen 1L,Aceites,5.50,100,"['Olivares del Sur']",2025-04-12
+11,Leche Entera 1L,Lacteos,1.25,450,"['Lacteos Asturias', 'Lacteos Galicia']",2025-04-16
