@@ -1,0 +1,4 @@
+codigo_barras,nombre,categoria,precio,stock,proveedores,fecha_reposicion
+11,Leche Entera Central Lechera 1L,Lacteos,1.30,380,"['Lacteos Galicia', 'Central Norte']",2025-04-15
+10,Arroz Largo SOS 1kg,Cereales,2.15,310,"['Suministros Basicos']",2025-04-14
+13,Pasta Penne 500g,Pastas,0.95,200,"['Pasta Italia']",2025-04-13
