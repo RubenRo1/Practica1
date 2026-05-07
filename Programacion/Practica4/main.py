@@ -25,9 +25,10 @@ def cargar_datos():
 
 
 def mostrar_datos(tree,p):
-     if p is not None:
+    if p is not None:
         mostrar_datos(tree, tree.left(p))
-        print(f"Codigo: {p.key()} -> {p.value()}")
+        print(f"{p.key()} - {p.value().nombre} - {p.value().categoria}")
+        print(f"Precio: {p.value().precio}€\nStock: {p.value().stock} unidades\nProveedores: {p.value().proveedores}\nFecha reposicion: {p.value().fecha}\n")
         mostrar_datos(tree, tree.right(p))
 
 
@@ -75,7 +76,7 @@ if __name__ == "__main__":
     mostrar_datos(avl_super, avl_super.root())
     print(f"--------------DATOS MERCAMAX--------------")
     mostrar_datos(avl_max, avl_max.root())
-    print(f"--------------FUUUUUUUUSION--------------")
+    print(f"RECORRIDO INORDEN (ordenado por código de barras): \n","="*55)
     avl_unificado = unificar(avl_max, avl_super)
 
     mostrar_datos(avl_unificado, avl_unificado.root())
