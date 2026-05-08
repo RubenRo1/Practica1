@@ -1,7 +1,18 @@
 from inventario import Inventario
 
 def mostrar_incidencias(incidencias):
+    """Muestra las incidencias generadas durante
+    la fusión de inventarios.
 
+    Parameters
+    ----------
+    incidencias : list
+        Lista de incidencias en formato texto.
+
+    Returns
+    -------
+    None.
+    """
     print(f"INCIDENCIAS:")
     print("="*30,"\n")
     if len(incidencias) == 0:
@@ -12,7 +23,26 @@ def mostrar_incidencias(incidencias):
         print(incidencia, "\n")
 
 def generar_informe_fusion(avl_super, avl_max, incidencias, resultado, tipo):
-    
+    """Genera el informe de fusión de inventarios.
+
+    Parameters
+    ----------
+    avl_super : Inventario
+        Inventario de SuperCompra.
+    avl_max : Inventario
+        Inventario de MegaMax.
+    incidencias : list
+        Lista de incidencias generadas durante la fusión.
+    resultado : str
+        Tipo de inventario generado
+        (UNIFICADO o COMÚN).
+    tipo : str
+        Descripción del tipo de fusión.
+
+    Returns
+    -------
+    None.
+    """
     print(f"="*60)
     print(f"INVENTARIO {resultado} - MegaMercado")
     print(f"Fusión de SuperCompra (SC) y MegaMax (MM) ({tipo})")
@@ -30,8 +60,37 @@ def generar_informe_fusion(avl_super, avl_max, incidencias, resultado, tipo):
 
     mostrar_incidencias(incidencias)
 
+def pausa():
+    """Pausa la ejecución del programa hasta que
+    el usuario pulse ENTER.
+
+    Parameters
+    ----------
+    None.
+
+    Returns
+    -------
+    None.
+    """
+    input("\nPulse ENTER para continuar ")
 
 def menu():
+    """
+    Muestra el menú principal del programa y
+    gestiona las operaciones disponibles.
+
+    Options
+    -------
+    1 : Cargar datos.
+    2 : Mostrar inventarios originales.
+    3 : Generar inventario unificado.
+    4 : Generar inventario común.
+    5 : Salir del programa.
+
+    Returns
+    -------
+    None.
+    """
 
     avl_super = Inventario("SuperCompra")
     avl_max = Inventario("MegaMax")
@@ -58,6 +117,8 @@ def menu():
                 avl_max.cargar_csv("inventario_mercamax.csv")
                 
                 print("\nDatos cargados correctamente.")
+
+                pausa()
             
             case "2":
                 if not cargados:
@@ -70,6 +131,8 @@ def menu():
                 print(f"\n--- INVENTARIO MEGAMAX ---")
                 avl_max.mostrar_inorden()
 
+                pausa()
+
             case "3":
                 if not cargados:
                     print(f"\nPrimero debes cargar los datos.")
@@ -81,6 +144,8 @@ def menu():
                 print("\n")
                 
                 avl_unificado.mostrar_inorden()
+
+                pausa()
 
             case "4":
                 
@@ -95,6 +160,7 @@ def menu():
                 
                 avl_unificado.mostrar_inorden()
     
+                pausa()
             case "5":
                 
                 print(f"\nSaliendo del programa...")
