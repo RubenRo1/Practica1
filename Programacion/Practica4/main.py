@@ -9,14 +9,15 @@ avl_super = AVL()
 avl_max = AVL()
 
 def cargar_datos():
-    with open("Practica4/inventario_supercompra.csv",newline="") as csvfile:
+
+    with open("inventario_supercompra.csv",newline="") as csvfile:
         producto_supermercado = csv.reader(csvfile,delimiter=",")
         next(producto_supermercado) #Salta la 1º linea
         for row in producto_supermercado:
             producto_supercompra = producto(row[0], row[1], row[2], float(row[3]), int(row[4]), ast.literal_eval(row[5]), row[6])
             avl_super[producto_supercompra.ean] = producto_supercompra
 
-    with open("Practica4/inventario_mercamax.csv",newline="") as csvfile:
+    with open("inventario_mercamax.csv",newline="") as csvfile:
         producto_supermercado2 = csv.reader(csvfile,delimiter=",")
         next(producto_supermercado2) #Salta la 1º linea
         for row in producto_supermercado2:
@@ -32,55 +33,105 @@ def mostrar_datos(tree,p):
         mostrar_datos(tree, tree.right(p))
 
 
-def insertar_unificado(tree, p, avl_unificado):
+def insertar_fusion(tree, p, avl_unificado, incidencias, tipo):
 
-    if p is not None:
-        insertar_unificado(tree, tree.left(p), avl_unificado)
+    if p is None:
+        return
 
-        producto_actual = p.value()
-        ean = producto_actual.ean
+    insertar_fusion(tree, tree.left(p), avl_unificado, incidencias, tipo)
+    
+    producto_actual = p.value()
+    ean = producto_actual.ean
 
-        if ean not in avl_unificado:
-
-            avl_unificado[ean] = copy.deepcopy(producto_actual)
-
-        else:
-            
-            existe = avl_unificado[ean]
-            existe.stock += producto_actual.stock
-
-            for proveedores in producto_actual.proveedores:
-                if proveedores not in existe.proveedores:
-                    existe.proveedores.append(proveedores)
-
-            if producto_actual.fecha > existe.fecha:
+    if ean not in avl_unificado:
+        avl_unificado[ean] = copy.deepcopy(producto_actual)
+        
+    else:
                 
+        existe = avl_unificado[ean]
+
+        stock1 = existe.stock
+        stock2 = producto_actual.stock
+        precio1 = existe.precio
+        precio2 = producto_actual.precio
+        fecha1 = existe.fecha
+        fecha2 = producto_actual.fecha
+        proveedores1 = existe.proveedores.copy()
+        proveedores2 = producto_actual.proveedores.copy()
+                
+        existe.stock += producto_actual.stock
+
+        for proveedores in producto_actual.proveedores:
+            if proveedores not in existe.proveedores:
+                existe.proveedores.append(proveedores)
+                
+        if tipo == "Unificar":
+            
+            if producto_actual.fecha > existe.fecha:        
                 existe.precio = producto_actual.precio
                 existe.fecha = producto_actual.fecha
+        else:
 
-        insertar_unificado(tree, tree.right(p), avl_unificado)
+            if producto_actual.precio > existe.precio:
+                existe.precio = producto_actual.precio
+                
+            if producto_actual.fecha > existe.fecha:
+                existe.fecha = producto_actual.fecha
+                    
+        incidencia = (
+            f"{ean} ({existe.nombre}) (SC) vs (MM)\n"
+            f"Stock: {stock1} + {stock2} -> {existe.stock}\n"
+            f"Precio: {precio1}€ vs {precio2}€ -> {existe.precio}\n"
+            f"Proveedores: {proveedores1} vs {proveedores2} -> {existe.proveedores}\n"
+            f"Fecha reposicion:  {fecha1} vs {fecha2} -> {existe.fecha}")
+                
+        incidencias.append(incidencia)
 
-def unificar(avl_max, avl_super):
+
+    insertar_fusion(tree, tree.right(p), avl_unificado, incidencias, tipo)
+            
+
+def unificar(avl_max, avl_super, tipo):
 
     avl_unificado = AVL()
 
-    insertar_unificado(avl_super, avl_super.root(), avl_unificado)
-    insertar_unificado(avl_max, avl_max.root(), avl_unificado)
+    incidencias = []
 
-    return avl_unificado
+    insertar_fusion(avl_super, avl_super.root(), avl_unificado, incidencias, tipo)
+    insertar_fusion(avl_max, avl_max.root(), avl_unificado, incidencias, tipo)
+
+    return avl_unificado, incidencias
+
+
+def generar_informe_fusion(avl_super, avl_max, avl_unificado, resultado, tipo):
+    
+    print(f"="*60)
+    print(f"INVENTARIO {resultado} - MegaMercado")
+    print(f"Fusión de SuperCompra (SC) y MegaMax (MM) ({tipo})")
+    print(f"="*60, "\n")
+    
+    compartidos = len(avl_max) + len(avl_super) - len(avl_unificado)
+    unicos = len(avl_unificado) - compartidos
+
+    print(f"INFORME DE FUSION")
+    print(f"="*20, "\n")
+    print(f"Productos en SuperCompra (SC): {len(avl_super)}" )
+    print(f"Productos en MegaMax (SC): {len(avl_max)}")
+    print(f"Productos únicos: {unicos}")
+    print(f"Productos compartidos: {compartidos}\n")
 
 
 if __name__ == "__main__":
     cargar_datos()
-    print(f"--------------DATOS SUPERCOMPRA--------------")
-    mostrar_datos(avl_super, avl_super.root())
-    print(f"--------------DATOS MERCAMAX--------------")
-    mostrar_datos(avl_max, avl_max.root())
-    print(f"RECORRIDO INORDEN (ordenado por código de barras): \n","="*55)
-    avl_unificado = unificar(avl_max, avl_super)
+    avl_unificado, incidencias = unificar(avl_max, avl_super,"Unificar")
 
-    mostrar_datos(avl_unificado, avl_unificado.root())
+    generar_informe_fusion(avl_super, avl_max, avl_unificado, "UNIFICADO","Solo productos compartidos")
+    
+    print(f"INCIDENCIAS:")
+    print("="*30,"\n")
 
+    for incidencia in incidencias:
+        print(incidencia, "\n")
 
     """
     Hice el punto 2 de la tarea q es Inventario unificado pero falta la ultima parte q esel informe de la fusion, lo q muestra y tal osea creo q es
