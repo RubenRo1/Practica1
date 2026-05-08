@@ -1,12 +1,4 @@
-from producto import producto
 from inventario import Inventario
-from avl_tree import AVL
-import csv
-import copy
-import ast
-
-avl_super = AVL()
-avl_max = AVL()
 
 def mostrar_incidencias(incidencias):
 
@@ -32,7 +24,7 @@ def generar_informe_fusion(avl_super, avl_max, incidencias, resultado, tipo):
     print(f"INFORME DE FUSION")
     print(f"="*20, "\n")
     print(f"Productos en SuperCompra (SC): {len(avl_super)}" )
-    print(f"Productos en MegaMax (SC): {len(avl_max)}")
+    print(f"Productos en MegaMax (MM): {len(avl_max)}")
     print(f"Productos únicos: {unicos}")
     print(f"Productos compartidos: {compartidos}\n")
 
