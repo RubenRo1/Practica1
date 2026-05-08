@@ -11,7 +11,8 @@ import ast
 import copy
 
 class Inventario:
-    """Representa el inventario de una cadena de supermercados.
+    """
+    Representa el inventario de una cadena de supermercados.
 
     El inventario almacena los productos en un árbol AVL, utilizando el
     código EAN como clave. De esta forma, las inserciones, búsquedas y
@@ -19,7 +20,8 @@ class Inventario:
     """
 
     def __init__(self, nombre):
-        """Crea un inventario vacío.
+        """
+        Crea un inventario vacío.
 
         Parameters
         ----------
@@ -34,7 +36,8 @@ class Inventario:
         self._productos = AVL()
 
     def __len__(self):
-        """Devuelve el número de productos del inventario.
+        """
+        Devuelve el número de productos del inventario.
 
         Parameters
         ----------
@@ -48,7 +51,8 @@ class Inventario:
         return len(self._productos)
 
     def insertar_producto(self, prod):
-        """Inserta un producto en el inventario.
+        """
+        Inserta un producto en el inventario.
 
         El producto se almacena en el árbol AVL usando su código EAN como
         clave. Si ya existe un producto con el mismo EAN, se sustituye el
@@ -66,7 +70,8 @@ class Inventario:
         self._productos[prod.ean] = prod
 
     def contiene(self, ean):
-        """Comprueba si existe un producto con el EAN indicado.
+        """
+        Comprueba si existe un producto con el EAN indicado.
 
         Parameters
         ----------
@@ -79,7 +84,7 @@ class Inventario:
             True si el producto está en el inventario, False en caso contrario.
         """
         #AVL_Tree tira un KeyError si no existe. Aunque en este ejercicio no deberia saltar nunca,
-        #es una buena practica protegerlo
+        #debemos tenerlo en cuenta porque sino nunca devolveria false, sino una excepcio
         try:
             self._productos[ean]
             return True
@@ -87,7 +92,8 @@ class Inventario:
             return False
 
     def obtener_producto(self, ean):
-        """Devuelve el producto asociado a un código EAN.
+        """
+        Devuelve el producto asociado a un código EAN.
 
         Parameters
         ----------
@@ -104,10 +110,13 @@ class Inventario:
         KeyError
             Si no existe ningún producto con ese EAN en el inventario.
         """
+        #No controlamos la excepcion en esta, ya que en este caso si que nos aporta informacion, 
+        # y podemos dejar al usuario de la clase decidir si controlarla desde fuera
         return self._productos[ean]
 
     def cargar_csv(self, ruta):
-        """Carga los productos de un archivo CSV en el inventario.
+        """
+        Carga los productos de un archivo CSV en el inventario.
 
         El archivo debe contener una cabecera y las columnas necesarias para
         construir cada producto: EAN, nombre, categoría, precio, stock,
@@ -140,7 +149,8 @@ class Inventario:
                 self.insertar_producto(prod)
 
     def mostrar_inorden(self):
-        """Muestra el inventario ordenado por código EAN.
+        """
+        Muestra el inventario ordenado por código EAN.
 
         El recorrido se realiza sobre el árbol AVL, que devuelve las claves
         ordenadas de menor a mayor. Cada clave permite recuperar e imprimir
@@ -161,7 +171,8 @@ class Inventario:
             print(self._productos[ean])
 
     def fusionar_unificado(self, otro, nombre):
-        """Crea un inventario unificado con todos los productos.
+        """
+        Crea un inventario unificado con todos los productos.
 
         El inventario resultante contiene los productos de ambos inventarios.
         Si un producto aparece en los dos, se fusiona sumando el stock,
@@ -205,7 +216,8 @@ class Inventario:
         return resultado, incidencias
 
     def fusionar_comun(self, otro, nombre):
-        """Crea un inventario común con los productos compartidos.
+        """
+        Crea un inventario común con los productos compartidos.
 
         El inventario resultante solo contiene productos que aparecen en ambos
         inventarios. Para cada producto compartido, se suma el stock, se
@@ -245,7 +257,8 @@ class Inventario:
         return resultado, incidencias
 
     def contar_compartidos(self, otro):
-        """Cuenta cuántos productos aparecen en ambos inventarios.
+        """
+        Cuenta cuántos productos aparecen en ambos inventarios.
 
         Parameters
         ----------
@@ -266,7 +279,8 @@ class Inventario:
         return contador
 
     def contar_unicos(self, otro):
-        """Cuenta cuántos productos aparecen solo en uno de los inventarios.
+        """
+        Cuenta cuántos productos aparecen solo en uno de los inventarios.
 
         Parameters
         ----------
@@ -282,7 +296,8 @@ class Inventario:
         return len(self) + len(otro) - 2 * compartidos
 
     def _fusionar_productos(self, prod1, prod2, criterio_precio):
-        """Fusiona dos productos con el mismo código EAN.
+        """
+        Fusiona dos productos con el mismo código EAN.
 
         El método crea una copia profunda del primer producto y modifica sus
         datos para representar la combinación de ambos productos. El criterio

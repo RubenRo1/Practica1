@@ -7,7 +7,8 @@ Autores:
 from inventario import Inventario
 
 def mostrar_incidencias(incidencias):
-    """Muestra las incidencias generadas durante
+    """
+    Muestra las incidencias generadas durante
     la fusión de inventarios.
 
     Parameters
@@ -29,7 +30,8 @@ def mostrar_incidencias(incidencias):
         print(incidencia, "\n")
 
 def generar_informe_fusion(inventario_super, inventario_max, incidencias, resultado, tipo):
-    """Genera el informe de fusión de inventarios.
+    """
+    Genera el informe de fusión de inventarios.
 
     Parameters
     ----------
@@ -67,7 +69,8 @@ def generar_informe_fusion(inventario_super, inventario_max, incidencias, result
     mostrar_incidencias(incidencias)
 
 def pausa():
-    """Pausa la ejecución del programa hasta que
+    """
+    Pausa la ejecución del programa hasta que
     el usuario pulse ENTER.
 
     Parameters

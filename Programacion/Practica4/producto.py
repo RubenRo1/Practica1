@@ -5,7 +5,8 @@ Autores:
 """
 
 class Producto:
-    """Representa un producto de un inventario de supermercado.
+    """
+    Representa un producto de un inventario de supermercado.
 
     Un producto queda identificado por su código EAN y almacena toda la
     información necesaria para la práctica: nombre, categoría, precio,
