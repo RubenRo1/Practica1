@@ -1,58 +1,85 @@
+"""
+Autores:
+    Iago Núñez Lourés - iago.nunez.loures@udc.es
+    Rubén Rodríguez Catrufo - ruben.rodriguez.catrufo@udc.es
+"""
+
 from avl_tree import AVL
-from producto import producto
+from producto import Producto
 import csv
 import ast
 import copy
 
-
 class Inventario:
-    """
-    Representa el inventario de una cadena de supermercados.
+    """Representa el inventario de una cadena de supermercados.
 
-    Internamente almacena los productos en un árbol AVL, usando como clave
-    el código EAN de cada producto.
+    El inventario almacena los productos en un árbol AVL, utilizando el
+    código EAN como clave. De esta forma, las inserciones, búsquedas y
+    recorridos ordenados se realizan directamente sobre el TAD AVL.
     """
 
     def __init__(self, nombre):
-        """
-        Crea un inventario vacío.
+        """Crea un inventario vacío.
 
-        Args:
-            nombre (str): Nombre de la cadena o inventario.
+        Parameters
+        ----------
+        nombre : str
+            Nombre de la cadena o del inventario.
+
+        Returns
+        -------
+        None.
         """
         self._nombre = nombre
         self._productos = AVL()
 
     def __len__(self):
-        """
-        Devuelve el número de productos del inventario.
+        """Devuelve el número de productos del inventario.
 
-        Returns:
-            int: Número de productos almacenados en el AVL.
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        int
+            Número de productos almacenados en el árbol AVL.
         """
         return len(self._productos)
 
     def insertar_producto(self, prod):
-        """
-        Inserta un producto en el inventario.
+        """Inserta un producto en el inventario.
 
-        Si ya existe un producto con el mismo EAN, se sustituye.
+        El producto se almacena en el árbol AVL usando su código EAN como
+        clave. Si ya existe un producto con el mismo EAN, se sustituye el
+        valor anterior por el nuevo producto.
 
-        Args:
-            prod (producto): Producto que se va a insertar.
+        Parameters
+        ----------
+        prod : producto
+            Producto que se va a insertar en el inventario.
+
+        Returns
+        -------
+        None.
         """
         self._productos[prod.ean] = prod
 
     def contiene(self, ean):
-        """
-        Comprueba si existe un producto con el EAN indicado.
+        """Comprueba si existe un producto con el EAN indicado.
 
-        Args:
-            ean (str): Código de barras del producto.
+        Parameters
+        ----------
+        ean : str
+            Código de barras del producto que se desea buscar.
 
-        Returns:
-            bool: True si el producto existe, False en caso contrario.
+        Returns
+        -------
+        bool
+            True si el producto está en el inventario, False en caso contrario.
         """
+        #AVL_Tree tira un KeyError si no existe. Aunque en este ejercicio no deberia saltar nunca,
+        #es una buena practica protegerlo
         try:
             self._productos[ean]
             return True
@@ -60,36 +87,47 @@ class Inventario:
             return False
 
     def obtener_producto(self, ean):
-        """
-        Devuelve el producto asociado a un EAN.
+        """Devuelve el producto asociado a un código EAN.
 
-        Args:
-            ean (str): Código de barras del producto.
+        Parameters
+        ----------
+        ean : str
+            Código de barras del producto que se desea obtener.
 
-        Returns:
-            producto: Producto asociado al EAN.
+        Returns
+        -------
+        producto
+            Producto asociado al código EAN indicado.
 
-        Raises:
-            KeyError: Si el EAN no existe en el inventario.
+        Raises
+        ------
+        KeyError
+            Si no existe ningún producto con ese EAN en el inventario.
         """
         return self._productos[ean]
 
     def cargar_csv(self, ruta):
-        """
-        Carga los productos de un archivo CSV en el inventario.
+        """Carga los productos de un archivo CSV en el inventario.
 
-        El CSV debe tener las columnas:
-        EAN, nombre, categoría, precio, stock, proveedores y fecha.
+        El archivo debe contener una cabecera y las columnas necesarias para
+        construir cada producto: EAN, nombre, categoría, precio, stock,
+        proveedores y fecha de última reposición.
 
-        Args:
-            ruta (str): Ruta del archivo CSV.
+        Parameters
+        ----------
+        ruta : str
+            Ruta del archivo CSV que contiene los productos.
+
+        Returns
+        -------
+        None.
         """
         with open(ruta, newline="") as csvfile:
             lector = csv.reader(csvfile, delimiter=",")
-            next(lector)  # Saltamos la cabecera
+            next(lector)  # Saltamos la cabecera del csv
 
             for row in lector:
-                prod = producto(
+                prod = Producto(
                     row[0],
                     row[1],
                     row[2],
@@ -102,10 +140,19 @@ class Inventario:
                 self.insertar_producto(prod)
 
     def mostrar_inorden(self):
-        """
-        Muestra el inventario ordenado por código EAN.
+        """Muestra el inventario ordenado por código EAN.
 
-        El recorrido es inorden porque el AVL mantiene las claves ordenadas.
+        El recorrido se realiza sobre el árbol AVL, que devuelve las claves
+        ordenadas de menor a mayor. Cada clave permite recuperar e imprimir
+        el producto asociado.
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        None.
         """
         print("RECORRIDO INORDEN (ordenado por código de barras):")
         print("=" * 55)
@@ -113,16 +160,27 @@ class Inventario:
         for ean in self._productos:
             print(self._productos[ean])
 
-
     def fusionar_unificado(self, otro, nombre):
-        """
-        Crea un inventario unificado con todos los productos.
+        """Crea un inventario unificado con todos los productos.
 
-        Si un producto aparece en ambos inventarios:
-        - se suma el stock;
-        - se combinan los proveedores sin duplicados;
-        - se conserva el precio del producto con fecha de reposición más reciente;
-        - se conserva la fecha de reposición más reciente.
+        El inventario resultante contiene los productos de ambos inventarios.
+        Si un producto aparece en los dos, se fusiona sumando el stock,
+        combinando proveedores sin duplicados, tomando el precio del producto
+        con fecha de reposición más reciente y conservando dicha fecha más
+        reciente.
+
+        Parameters
+        ----------
+        otro : Inventario
+            Segundo inventario que se fusionará con el inventario actual.
+        nombre : str
+            Nombre que tendrá el inventario resultante.
+
+        Returns
+        -------
+        tuple
+            Tupla formada por el inventario unificado y la lista de incidencias
+            generadas durante la fusión.
         """
         resultado = copy.deepcopy(self)
         resultado.nombre = nombre
@@ -137,7 +195,7 @@ class Inventario:
             else:
                 prod_resultado = resultado.obtener_producto(ean)
 
-                #Para el unificado usamos la fexcha como criterio
+                # Para el unificado usamos la fecha como criterio.
                 prod_fusionado, incidencia = self._fusionar_productos(
                     prod_resultado, prod_otro, criterio_precio="fecha")
 
@@ -147,20 +205,25 @@ class Inventario:
         return resultado, incidencias
 
     def fusionar_comun(self, otro, nombre):
-        """
-        Crea un inventario común solo con los productos compartidos.
+        """Crea un inventario común con los productos compartidos.
 
-        Si un producto aparece en ambos inventarios:
-        - se suma el stock;
-        - se combinan los proveedores sin duplicados;
-        - se conserva el precio más caro;
-        - se conserva la fecha de reposición más reciente.
+        El inventario resultante solo contiene productos que aparecen en ambos
+        inventarios. Para cada producto compartido, se suma el stock, se
+        combinan los proveedores sin duplicados, se toma el precio más caro y
+        se conserva la fecha de reposición más reciente.
 
-        Args:
-            otro (Inventario): Segundo inventario a fusionar.
+        Parameters
+        ----------
+        otro : Inventario
+            Segundo inventario con el que se compara el inventario actual.
+        nombre : str
+            Nombre que tendrá el inventario común resultante.
 
-        Returns:
-            tuple: Inventario común e incidencias generadas.
+        Returns
+        -------
+        tuple
+            Tupla formada por el inventario común y la lista de incidencias
+            generadas durante la fusión.
         """
         resultado = Inventario(nombre)
         incidencias = []
@@ -182,14 +245,17 @@ class Inventario:
         return resultado, incidencias
 
     def contar_compartidos(self, otro):
-        """
-        Cuenta cuántos productos aparecen en ambos inventarios.
+        """Cuenta cuántos productos aparecen en ambos inventarios.
 
-        Args:
-            otro (Inventario): Segundo inventario.
+        Parameters
+        ----------
+        otro : Inventario
+            Inventario con el que se compara el inventario actual.
 
-        Returns:
-            int: Número de productos compartidos.
+        Returns
+        -------
+        int
+            Número de productos compartidos por ambos inventarios.
         """
         contador = 0
 
@@ -200,33 +266,46 @@ class Inventario:
         return contador
 
     def contar_unicos(self, otro):
-        """
-        Cuenta cuántos productos aparecen solo en uno de los inventarios.
+        """Cuenta cuántos productos aparecen solo en uno de los inventarios.
 
-        Args:
-            otro (Inventario): Segundo inventario.
+        Parameters
+        ----------
+        otro : Inventario
+            Inventario con el que se compara el inventario actual.
 
-        Returns:
-            int: Número de productos no compartidos.
+        Returns
+        -------
+        int
+            Número de productos exclusivos de uno de los dos inventarios.
         """
         compartidos = self.contar_compartidos(otro)
         return len(self) + len(otro) - 2 * compartidos
 
     def _fusionar_productos(self, prod1, prod2, criterio_precio):
-        """
-        Fusiona dos productos con el mismo EAN.
+        """Fusiona dos productos con el mismo código EAN.
 
-        Args:
-            prod1 (producto): Producto del primer inventario.
-            prod2 (producto): Producto del segundo inventario.
-            criterio_precio (str): Puede ser "fecha" o "mayor".
+        El método crea una copia profunda del primer producto y modifica sus
+        datos para representar la combinación de ambos productos. El criterio
+        de precio cambia según el tipo de fusión: por fecha para el inventario
+        unificado y por precio mayor para el inventario común.
 
-        Returns:
-            tuple: Producto fusionado e incidencia en formato texto.
+        Parameters
+        ----------
+        prod1 : producto
+            Producto procedente del primer inventario.
+        prod2 : producto
+            Producto procedente del segundo inventario.
+        criterio_precio : str
+            Criterio usado para decidir el precio final. Puede ser "fecha" o
+            "mayor".
+
+        Returns
+        -------
+        tuple
+            Tupla formada por el producto fusionado y el texto de incidencia
+            que describe los cambios realizados.
         """
         fusionado = copy.deepcopy(prod1)
-
-        # Sumamos stock.
         fusionado.stock = prod1.stock + prod2.stock
 
         # Combinamos proveedores sin duplicados.
@@ -244,7 +323,6 @@ class Inventario:
         elif criterio_precio == "mayor":
             fusionado.precio = max(prod1.precio, prod2.precio)
 
-        # La fecha siempre será la más reciente.
         fusionado.fecha = max(prod1.fecha, prod2.fecha)
 
         incidencia = (

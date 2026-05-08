@@ -1,3 +1,9 @@
+"""
+Autores:
+    Iago Núñez Lourés - iago.nunez.loures@udc.es
+    Rubén Rodríguez Catrufo - ruben.rodriguez.catrufo@udc.es
+"""
+
 from inventario import Inventario
 
 def mostrar_incidencias(incidencias):
@@ -13,7 +19,7 @@ def mostrar_incidencias(incidencias):
     -------
     None.
     """
-    print(f"INCIDENCIAS:")
+    print("INCIDENCIAS:")
     print("="*30,"\n")
     if len(incidencias) == 0:
         print("No hay productos compartidos.\n")
@@ -22,14 +28,14 @@ def mostrar_incidencias(incidencias):
     for incidencia in incidencias:
         print(incidencia, "\n")
 
-def generar_informe_fusion(avl_super, avl_max, incidencias, resultado, tipo):
+def generar_informe_fusion(inventario_super, inventario_max, incidencias, resultado, tipo):
     """Genera el informe de fusión de inventarios.
 
     Parameters
     ----------
-    avl_super : Inventario
+    inventario_super : Inventario
         Inventario de SuperCompra.
-    avl_max : Inventario
+    inventario_max : Inventario
         Inventario de MegaMax.
     incidencias : list
         Lista de incidencias generadas durante la fusión.
@@ -43,18 +49,18 @@ def generar_informe_fusion(avl_super, avl_max, incidencias, resultado, tipo):
     -------
     None.
     """
-    print(f"="*60)
+    print("="*60)
     print(f"INVENTARIO {resultado} - MegaMercado")
     print(f"Fusión de SuperCompra (SC) y MegaMax (MM) ({tipo})")
-    print(f"="*60, "\n")
+    print("="*60, "\n")
 
-    compartidos = avl_super.contar_compartidos(avl_max)
-    unicos = avl_super.contar_unicos(avl_max)
+    compartidos = inventario_super.contar_compartidos(inventario_max)
+    unicos = inventario_super.contar_unicos(inventario_max)
 
-    print(f"INFORME DE FUSION")
-    print(f"="*20, "\n")
-    print(f"Productos en SuperCompra (SC): {len(avl_super)}" )
-    print(f"Productos en MegaMax (MM): {len(avl_max)}")
+    print("INFORME DE FUSION")
+    print("="*20, "\n")
+    print(f"Productos en SuperCompra (SC): {len(inventario_super)}" )
+    print(f"Productos en MegaMax (MM): {len(inventario_max)}")
     print(f"Productos únicos: {unicos}")
     print(f"Productos compartidos: {compartidos}\n")
 
@@ -92,8 +98,8 @@ def menu():
     None.
     """
 
-    avl_super = Inventario("SuperCompra")
-    avl_max = Inventario("MegaMax")
+    inventario_super = Inventario("SuperCompra")
+    inventario_max = Inventario("MegaMax")
     cargados = False
 
     while True:
@@ -113,8 +119,8 @@ def menu():
 
                 cargados = True
 
-                avl_super.cargar_csv("inventario_supercompra.csv")
-                avl_max.cargar_csv("inventario_mercamax.csv")
+                inventario_super.cargar_csv("inventario_supercompra.csv")
+                inventario_max.cargar_csv("inventario_mercamax.csv")
                 
                 print("\nDatos cargados correctamente.")
 
@@ -122,55 +128,54 @@ def menu():
             
             case "2":
                 if not cargados:
-                    print(f"\nPrimero debes cargar los datos.")
+                    print("\nPrimero debes cargar los datos.")
                     continue
 
-                print(f"\n--- INVENTARIO SUPERCOMPRA ---")
-                avl_super.mostrar_inorden()
+                print("\n--- INVENTARIO SUPERCOMPRA ---")
+                inventario_super.mostrar_inorden()
 
-                print(f"\n--- INVENTARIO MEGAMAX ---")
-                avl_max.mostrar_inorden()
+                print("\n--- INVENTARIO MEGAMAX ---")
+                inventario_max.mostrar_inorden()
 
                 pausa()
 
             case "3":
                 if not cargados:
-                    print(f"\nPrimero debes cargar los datos.")
+                    print("\nPrimero debes cargar los datos.")
                     continue
 
-                avl_unificado, incidencias = (avl_super.fusionar_unificado(avl_max, "MegaMercado"))
-                generar_informe_fusion(avl_super, avl_max, incidencias, "UNIFICADO","Todos los productos")      
+                inventario_unificado, incidencias = (inventario_super.fusionar_unificado(inventario_max, "MegaMercado"))
+                generar_informe_fusion(inventario_super, inventario_max, incidencias, "UNIFICADO","Todos los productos")      
 
                 print("\n")
                 
-                avl_unificado.mostrar_inorden()
+                inventario_unificado.mostrar_inorden()
 
                 pausa()
 
             case "4":
                 
                 if not cargados:
-                    print(f"\nPrimero debes cargar los datos.")
+                    print("\nPrimero debes cargar los datos.")
                     continue
 
-                avl_unificado, incidencias = (avl_super.fusionar_comun(avl_max, "MegaMercado"))
-                generar_informe_fusion(avl_super, avl_max, incidencias, "COMÚN","Solo productos compartidos")      
+                inventario_unificado, incidencias = (inventario_super.fusionar_comun(inventario_max, "MegaMercado"))
+                generar_informe_fusion(inventario_super, inventario_max, incidencias, "COMÚN","Solo productos compartidos")      
 
                 print("\n")
                 
-                avl_unificado.mostrar_inorden()
+                inventario_unificado.mostrar_inorden()
     
                 pausa()
             case "5":
                 
-                print(f"\nSaliendo del programa...")
+                print("\nSaliendo del programa...")
                 break
 
             case _:
 
-                print(f"\nERROR\nOpción inválida")
+                print("\nERROR\nOpción inválida")
 
 
-if __name__ == "__main__":
-    
+if __name__ == "__main__": 
     menu()
