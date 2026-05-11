@@ -21,46 +21,47 @@ subs(X/T, X, T) :- !.
 
 %Átomo
 %Si es algo atómico (no compuesto) y no entró en la regla anterior, se queda igual.
-subs(_, A, A) :-
-    atomic(A), !. 
+% subs(_, A, A) :-
+%     atomic(A), !. 
 
 %Conectores binarios (&, v, ->, <-, <->)
 %Descomponemos la fórmula, llamamos recursivamente a cada lado y volvemos a montar.
-subs(X/T, A & B, A1 & B1) :- 
-    !,
-    subs(X/T, A, A1), 
-    subs(X/T,B,B1).
+% subs(X/T, A & B, A1 & B1) :- 
+%     !,
+%     subs(X/T, A, A1), 
+%     subs(X/T,B,B1).
 
-subs(X/T, A v B, A1 v B1) :- 
-    !,
-    subs(X/T, A, A1), 
-    subs(X/T, B, B1).
+% subs(X/T, A v B, A1 v B1) :- 
+%     !,
+%     subs(X/T, A, A1), 
+%     subs(X/T, B, B1).
 
-subs(X/T, A -> B, A1 -> B1) :- 
-    !,
-    subs(X/T, A, A1),
-    subs(X/T, B, B1).
+% subs(X/T, A -> B, A1 -> B1) :- 
+%     !,
+%     subs(X/T, A, A1),
+%     subs(X/T, B, B1).
 
-subs(X/T, A <- B, A1 <- B1) :- 
-    !,
-    subs(X/T, A, A1),
-    subs(X/T, B, B1).
+% subs(X/T, A <- B, A1 <- B1) :- 
+%     !,
+%     subs(X/T, A, A1),
+%     subs(X/T, B, B1).
 
-subs(X/T, A <-> B, A1 <-> B1) :- 
-    !,
-    subs(X/T, A, A1),
-    subs(X/T, B, B1).  
+% subs(X/T, A <-> B, A1 <-> B1) :- 
+%     !,
+%     subs(X/T, A, A1),
+%     subs(X/T, B, B1).  
 
 %Negacion
 %Caso unario: bajamos a la fórmula A, la modificamos a A1 y mantenemos el '-'.
-subs(X/T, -A, -A1) :-
-    !,
-    subs(X/T, A, A1).
+% subs(X/T, -A, -A1) :-
+%     !,
+%     subs(X/T, A, A1).
 
 %forall/exits
 %Si intentamos sustituir X, pero X está ligada por un forall/exists, NO tocamos nada.
+
 subs(X/_, forall X :: F, forall X :: F) :- !.
-subs(X/T, exists X :: F, exists X :: F) :- !.
+subs(X/_, exists X :: F, exists X :: F) :- !.
 
 
 %Si el cuantificador es sobre otra variable (Y), entramos a sustituir en la fórmula F.
@@ -100,4 +101,5 @@ subs_list([H|T], F, G1) :-
 
 %EJERCICIO OPCIONAL
 %Añadir dos argumentos, una lista en la que añado todos los argumentos cuantificados y los que estan libres
-%La lista puede ser un par la variable + la parte de la formula donde fue cuantificada, par mostrar en el mensaje de error
+%La lista puede ser un par la variable + la parte de la formula donde fue cuantificada, par mostrar en el mensaje de error 
+
