@@ -255,10 +255,4 @@ class laboratorio:
         """
         salida = "--------STOCK ACTUAL--------\n"
         salida += " | ".join(str(ing) for ing in self._almacen)
-        return salida        
-
-    '''
-    getters y setters
-    '''
-
-    
+        return salida           
