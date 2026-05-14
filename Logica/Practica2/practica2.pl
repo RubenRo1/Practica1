@@ -1,3 +1,6 @@
+% Rubén Rodríguez Catrufo ruben.rodriguez.catrufo@udc.es
+% Iago Núñez Lourés iago.nunez.loures@udc.es
+
 :- op(1060, yfx, <->). %doble implicación
 :- op(1050, yfx, <-). %implicación hacia la izquierda
 :- op(600, yfx, v). %disyunción
