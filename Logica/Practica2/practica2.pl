@@ -10,56 +10,12 @@
 % subs(X/T,F,G) Remplaza var X by term T on formula or term F to produce G
 % subs_list(L,F,G) replaces a list of pairs X/T in F to get G
 
-%Remplazo sobre las apariciones libres solo
-%subs(y/f(a), forall x :: p(x,y), G).
-% G = forall x :: p(x, f(a))
-% subs(X/T, A & B, A1 & B1) :- subs(X/T, A, A1), subs(X/T,B,B1).
-
 %Variable
 %Si F es X, el resultado G es directamente el término T.
 subs(X/T, X, T) :- !.
 
-%Átomo
-%Si es algo atómico (no compuesto) y no entró en la regla anterior, se queda igual.
-% subs(_, A, A) :-
-%     atomic(A), !. 
-
-%Conectores binarios (&, v, ->, <-, <->)
-%Descomponemos la fórmula, llamamos recursivamente a cada lado y volvemos a montar.
-% subs(X/T, A & B, A1 & B1) :- 
-%     !,
-%     subs(X/T, A, A1), 
-%     subs(X/T,B,B1).
-
-% subs(X/T, A v B, A1 v B1) :- 
-%     !,
-%     subs(X/T, A, A1), 
-%     subs(X/T, B, B1).
-
-% subs(X/T, A -> B, A1 -> B1) :- 
-%     !,
-%     subs(X/T, A, A1),
-%     subs(X/T, B, B1).
-
-% subs(X/T, A <- B, A1 <- B1) :- 
-%     !,
-%     subs(X/T, A, A1),
-%     subs(X/T, B, B1).
-
-% subs(X/T, A <-> B, A1 <-> B1) :- 
-%     !,
-%     subs(X/T, A, A1),
-%     subs(X/T, B, B1).  
-
-%Negacion
-%Caso unario: bajamos a la fórmula A, la modificamos a A1 y mantenemos el '-'.
-% subs(X/T, -A, -A1) :-
-%     !,
-%     subs(X/T, A, A1).
-
 %forall/exits
 %Si intentamos sustituir X, pero X está ligada por un forall/exists, NO tocamos nada.
-
 subs(X/_, forall X :: F, forall X :: F) :- !.
 subs(X/_, exists X :: F, exists X :: F) :- !.
 
@@ -76,7 +32,6 @@ subs(X/T, F, G) :-
     F =.. [Pred|Argum], %Separamos el nombre del predicado
     recorrer_subs(X/T,Argum, Argum2), %Recorremos la lista de argumentos
     G =.. [Pred|Argum2]. %Devolvemos el nombre del predicado + los nuevos argumentos
-
     
 %Lista de argumentos
 %Caso base: la lista vacía se queda vacía.
@@ -97,9 +52,4 @@ subs_list([H|T], F, G1) :-
     subs(H, F, G),
     !,
     subs_list(T, G, G1).
-
-
-%EJERCICIO OPCIONAL
-%Añadir dos argumentos, una lista en la que añado todos los argumentos cuantificados y los que estan libres
-%La lista puede ser un par la variable + la parte de la formula donde fue cuantificada, par mostrar en el mensaje de error 
 
